@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<head>
+	<title>See other profile's likes on Bluesky</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="color-scheme" content="light dark" />
+	<style>
+		.main {
+			font-family: sans-serif;
+			font-size: 10pt;
+			margin: 0 auto;
+			max-width: 600px;
+		}
+		.profile-form {
+			display: flex;
+			margin-top: 8px;
+			margin-bottom: 8px;
+		}
+		.profile {
+			flex: 1;
+		}
+		.posts {
+			margin-top: 8px;
+			margin-bottom: 8px;
+		}
+		.final {
+			text-align: center;
+			margin-top: 8px;
+			margin-bottom: 8px;
+		}
+	</style>
+</head>
+<body>
+	<div class="main">
+		<form class="profile-form">
+			<input class="profile" type="text" placeholder="username.bsky.social" />
+			<button class="show-likes">Show likes</button>
+		</form>
+		<div class="posts">
+			<div class="pages"></div>
+			<div class="final"></div>
+		</div>
+	</div>
+
+	<script>
+let profile;
+let abortController = null;
+
+const main = async () => {
+	// Check query string
+	if (location.search != "") {
+		profile = location.search.slice(1);
+		$('.profile').value = profile;
+
+		profile = parseProfile(profile);
+		if (profile == null) return;
+
+		await abortWrapper(load);
+	}
+
+	$('.profile-form').onsubmit = async e => {
+		e.preventDefault();
+
+		profile = parseProfile($('.profile').value);
+		if (profile == null) return;
+
+		await abortWrapper(load);
+	}
+}
+
+const $ = q => document.querySelector(q);
+
+const html = (tag, attrs, contents) => {
+	const e = document.createElement(tag);
+	if (attrs) {
+		for (let [attrName, attrValue] of Object.entries(attrs)) {
+			e.setAttribute(attrName, attrValue);
+		}
+	}
+	if (contents) {
+		if (!Array.isArray(contents))
+			contents = [contents];
+		e.append(...contents);
+	}
+	return e;
+}
+
+const parseProfile = (input) => {
+	if (input.startsWith('http://') || input.startsWith('https://')) {
+		input = input.split('//')[1];
+	}
+	if (input.startsWith('bsky.app/profile/')) {
+		input = input.slice('bsky.app/profile/'.length);
+	}
+	if (input == "") return null;
+
+	console.log(input);
+	return input;
+}
+
+class NotOkError extends Error { }
+
+const apiRequest = async (endpoint, args) => {
+	let url = endpoint + "?" + new URLSearchParams(args);
+	let res = await fetch(url, { signal: abortController.signal });
+	if (!res.ok) throw new NotOkError(`${res.status}`);
+	let json = await res.json();
+	return json;
+}
+
+const parseUri = (uri) => {
+	return {
+		repo: uri.split("/")[2],
+		collection: uri.split("/")[3],
+		rkey: uri.split("/")[4],
+	};
+}
+
+const appendLikes = async (cursor) => {
+	let likes = await apiRequest("https://bsky.social/xrpc/com.atproto.repo.listRecords", {
+		repo: profile,
+		collection: "app.bsky.feed.like",
+		cursor,
+		limit: 25,
+	});
+
+	console.log(likes);
+
+	let pageElem = $('.pages').appendChild(html("div", { class: "page" }));
+
+	let posts = [];
+	for (let like of likes.records) {
+		let getPost = async (like) => {
+			let record = await apiRequest("https://bsky.social/xrpc/com.atproto.repo.getRecord", {
+				...parseUri(like.uri),
+				cid: like.cid,
+			});
+
+			console.log(record);
+
+			// let postThread = await apiRequest("https://public.api.bsky.app/xrpc/app.bsky.feed.getPostThread", {
+			// 	uri: record.value.subject.uri,
+			// });
+
+			// console.log(postThread);
+
+			return record;
+		}
+
+		let post = getPost(like);
+		posts.push({ like, post });
+	}
+
+	for ({ like, post } of posts) {
+		let postElem = pageElem.appendChild(html('div', { class: "post" }));
+
+		try {
+			post = await post;
+
+			let uri = parseUri(post.value.subject.uri);
+			let bskyUrl = `https://bsky.app/profile/${uri.repo}/post/${uri.rkey}`;
+
+			postElem.append(html('a', { href: bskyUrl }, bskyUrl));
+
+			postElem.append(makeEmbed(post.value.subject));
+
+			postElem.append(html('script', {
+				src: "https://embed.bsky.app/static/embed.js",
+				charset: "utf-8",
+				async: "async",
+			}));
+		} catch (e) {
+			if (e instanceof NotOkError) {
+				postElem.append(`Error when fetching ${like.uri}: ${e.message}`);
+			} else {
+				throw e;
+			}
+		}
+	}
+
+	return likes.cursor;
+}
+
+const makeEmbed = (post) => {
+	return html('blockquote', {
+		'data-bluesky-uri': post.uri,
+		'data-bluesky-cid': post.cid,
+	}, `Loading ${post.uri} embed`);
+}
+
+const abortWrapper = async (func) => {
+	abortController?.abort();
+
+	try {
+		abortController = new AbortController();
+		await func();
+		abortController = null;
+	} catch (e) {
+		if (e.name == "AbortError") {
+			// console.log("load aborted", e);
+		} else {
+			throw e;
+		}
+	}
+}
+
+const load = async () => {
+	abortController.signal.addEventListener('abort', e => {
+		$('.final').textContent = "Request cancelled";
+	});
+
+	$('.pages').replaceChildren();
+
+	const appendLikesWithMore = async (cursor) => {
+		try {
+			$('.final').textContent = "Loading...";
+
+			cursor = await appendLikes(cursor);
+
+			if (cursor) {
+				let loadMoreLikesElem = html('button', {}, 'Load more likes');
+				loadMoreLikesElem.onclick = async () => {
+					await abortWrapper(async () => {
+						abortController.signal.addEventListener('abort', e => {
+							$('.final').textContent = "Request cancelled";
+						});
+
+						await appendLikesWithMore(cursor);
+					});
+				};
+				$('.final').replaceChildren(loadMoreLikesElem);
+			} else {
+				$('.final').textContent = "End of likes";
+			}
+		} catch (e) {
+			if (e instanceof NotOkError) {
+				$('.final').textContent = `Error when fetching likes: ${e.message}`;
+			} else {
+				throw e;
+			}
+		}
+	}
+	await appendLikesWithMore();
+}
+
+main();
+	</script>
+</body>
