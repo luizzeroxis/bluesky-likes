@@ -2,6 +2,7 @@
 
 <head>
 	<title>See other profile's likes on Bluesky</title>
+	<meta name="description" content="Wanna view the Bluesky likes of another user? This website will allow you to check that using the official Bluesky API." />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="color-scheme" content="light dark" />
 	<style>
@@ -10,6 +11,10 @@
 			font-size: 10pt;
 			margin: 0 auto;
 			max-width: 600px;
+		}
+		.header {
+			display: flex;
+			justify-content: space-between;
 		}
 		.profile-form {
 			display: flex;
@@ -32,6 +37,10 @@
 </head>
 <body>
 	<div class="main">
+		<div class="header">
+			<strong>See other profile's likes on Bluesky</strong>
+			<a href="https://github.com/luizzeroxis/bluesky-likes/">Source code - GPLv3</a>
+		</div>
 		<form class="profile-form">
 			<input class="profile" type="text" placeholder="username.bsky.social" />
 			<button class="show-likes">Show likes</button>
@@ -131,20 +140,13 @@ const appendLikes = async (cursor) => {
 	let posts = [];
 	for (let like of likes.records) {
 		let getPost = async (like) => {
-			let record = await apiRequest("https://bsky.social/xrpc/com.atproto.repo.getRecord", {
-				...parseUri(like.uri),
-				cid: like.cid,
-			});
-
-			console.log(record);
-
 			// let postThread = await apiRequest("https://public.api.bsky.app/xrpc/app.bsky.feed.getPostThread", {
 			// 	uri: record.value.subject.uri,
 			// });
 
 			// console.log(postThread);
 
-			return record;
+			return like;
 		}
 
 		let post = getPost(like);
@@ -160,15 +162,9 @@ const appendLikes = async (cursor) => {
 			let uri = parseUri(post.value.subject.uri);
 			let bskyUrl = `https://bsky.app/profile/${uri.repo}/post/${uri.rkey}`;
 
-			postElem.append(html('a', { href: bskyUrl }, bskyUrl));
+			postElem.append(html('div', {}, `Liked at ${new Date(post.value.createdAt).toLocaleString()}:`));
 
 			postElem.append(makeEmbed(post.value.subject));
-
-			postElem.append(html('script', {
-				src: "https://embed.bsky.app/static/embed.js",
-				charset: "utf-8",
-				async: "async",
-			}));
 		} catch (e) {
 			if (e instanceof NotOkError) {
 				postElem.append(`Error when fetching ${like.uri}: ${e.message}`);
@@ -182,10 +178,17 @@ const appendLikes = async (cursor) => {
 }
 
 const makeEmbed = (post) => {
-	return html('blockquote', {
-		'data-bluesky-uri': post.uri,
-		'data-bluesky-cid': post.cid,
-	}, `Loading ${post.uri} embed`);
+	return html('div', {}, [
+		html('blockquote', {
+			'data-bluesky-uri': post.uri,
+			'data-bluesky-cid': post.cid,
+		}, `Loading ${post.uri} embed...`),
+		html('script', {
+			src: "https://embed.bsky.app/static/embed.js",
+			charset: "utf-8",
+			async: "async",
+		})
+	]);
 }
 
 const abortWrapper = async (func) => {
