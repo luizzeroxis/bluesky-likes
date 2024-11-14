@@ -28,6 +28,14 @@
 			margin-top: 8px;
 			margin-bottom: 8px;
 		}
+		.like-line-1 {
+			display: flex;
+			gap: 8px;
+			align-items: baseline;
+		}
+		.like-line-1 .liked-at {
+			flex: 1;
+		}
 		.final {
 			text-align: center;
 			margin-top: 8px;
@@ -79,7 +87,7 @@ const main = async () => {
 
 const $ = q => document.querySelector(q);
 
-const html = (tag, attrs, contents) => {
+const html = (tag, attrs, contents, exec) => {
 	const e = document.createElement(tag);
 	if (attrs) {
 		for (let [attrName, attrValue] of Object.entries(attrs)) {
@@ -90,6 +98,9 @@ const html = (tag, attrs, contents) => {
 		if (!Array.isArray(contents))
 			contents = [contents];
 		e.append(...contents);
+	}
+	if (exec) {
+		exec(e);
 	}
 	return e;
 }
@@ -153,7 +164,7 @@ const appendLikes = async (cursor) => {
 		posts.push({ like, post });
 	}
 
-	for ({ like, post } of posts) {
+	for (let { like, post } of posts) {
 		let postElem = pageElem.appendChild(html('div', { class: "post" }));
 
 		try {
@@ -162,9 +173,19 @@ const appendLikes = async (cursor) => {
 			let uri = parseUri(post.value.subject.uri);
 			let bskyUrl = `https://bsky.app/profile/${uri.repo}/post/${uri.rkey}`;
 
-			postElem.append(html('div', {}, `Liked at ${new Date(post.value.createdAt).toLocaleString()}:`));
+			let embed = makeEmbed(post.value.subject);
 
-			postElem.append(makeEmbed(post.value.subject));
+			postElem.append(html('div', {class: 'like-line-1'}, [
+				html('div', {class: 'liked-at'}, `Liked at ${new Date(post.value.createdAt).toLocaleString()}:`),
+				html('a', { href: bskyUrl }, 'Open on bsky.app'),
+				html('button', {title: 'Reload embed'}, '🔄︎', e => {
+					e.addEventListener('click', () => {
+						embed.replaceChildren(makeEmbed(post.value.subject));
+					})
+				}),
+			]));
+
+			postElem.append(embed);
 		} catch (e) {
 			if (e instanceof NotOkError) {
 				postElem.append(`Error when fetching ${like.uri}: ${e.message}`);
@@ -178,7 +199,7 @@ const appendLikes = async (cursor) => {
 }
 
 const makeEmbed = (post) => {
-	return html('div', {}, [
+	return html('div', {class: 'bsky-embed'}, [
 		html('blockquote', {
 			'data-bluesky-uri': post.uri,
 			'data-bluesky-cid': post.cid,
