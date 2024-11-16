@@ -129,7 +129,19 @@
 			flex: 1;
 		}
 
-		.post .embed-video a img:hover {
+		.post .embed-video {
+			position: relative;
+		}
+
+		.post .embed-video a::after {
+			content: "▶︎";
+			position: absolute;
+			top: 8px;
+			left: 8px;
+			opacity: 0.5;
+		}
+
+		.post .embed-video a:hover {
 			outline: 1px solid gray;
 		}
 
@@ -329,7 +341,8 @@ const appendLikes = async (cursor) => {
 				if (post) {
 					likeElem.append(makePostView(post));
 				} else {
-					likeElem.append(html('a', { href: toPostUri(likeRecord.value.subject.uri) }, `Post not found, it may have been deleted.`));
+					likeElem.append(html('div', { class: 'post' },
+						html('a', { href: toPostUri(likeRecord.value.subject.uri) }, `Post not found, it may have been deleted.`)));
 				}
 			} else {
 				likeElem.append(html('div', { class: 'post' }, `Unsupported collection type ${likeRecord.value.subject.uri}`));
@@ -426,7 +439,7 @@ const makePostEmbeds = (postEmbeds, post) => {
 			));
 		} else if (postEmbed.$type == 'app.bsky.embed.video#view') {
 			return html('div', { class: 'embed-video' },
-				html('a', { href: toPostUri(post.uri) }, html('img', { class: 'embed-thumbnail', src: postEmbed.thumbnail, alt: 'Video', title: 'Video' }))
+				html('a', { href: toPostUri(post.uri), title: 'Video' }, html('img', { class: 'embed-thumbnail', src: postEmbed.thumbnail }))
 			);
 		} else if (postEmbed.$type == 'app.bsky.embed.external#view') {
 			return html('div', { class: 'embed-external' },
