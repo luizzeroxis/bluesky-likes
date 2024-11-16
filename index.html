@@ -35,12 +35,16 @@
 		.profile-form {
 			display: flex;
 			flex-wrap: wrap;
+			justify-content: end;
 			margin-top: 8px;
 			margin-bottom: 8px;
+			column-gap: 8px;
 		}
 
 		.profile {
 			flex: 1;
+			flex-basis: 100%;
+			min-width: 0;
 		}
 
 		.posts {
@@ -164,6 +168,7 @@
 		</div>
 		<form class="profile-form">
 			<input class="profile" type="text" placeholder="https://bsky.app/profile/handle.bsky.social" />
+			<label><input class="show-hidden" type="checkbox">Show adult/hidden</label>
 			<select class="display-method" title="Method to use to display posts.">
 				<option value="embed" title="Use embeded iframes from Bluesky. Slow.">Embed</option>
 				<option value="custom"
@@ -181,8 +186,9 @@
 
 	<script>
 let abortController = null;
-let profile;
 
+let profile;
+let showHidden = false;
 let useEmbeds = true;
 let useCustom = false;
 
@@ -205,6 +211,8 @@ const main = async () => {
 
 		profile = parseProfile($('.profile').value);
 		if (profile == null) return;
+
+		showHidden = $('.show-hidden').checked;
 
 		let displayMethod = $('.display-method').value;
 		if (displayMethod == 'embed') {
@@ -448,11 +456,12 @@ const makeEmbedRecordView = (embedRecordView) => {
 }
 
 const shouldHidePost = (post) => {
+	if (showHidden) return false;
 	if (!post.labels) return false;
 
 	let values = [];
 	for (let label of post.labels) {
-		if (['!hide', '!warn', '!no-unauthenticated', 'porn', 'sexual', 'graphic-media', 'nudity'].includes(label.val)) {
+		if (['!hide', '!warn', '!no-unauthenticated', 'porn', 'sexual', 'graphic-media', 'nudity', 'sexual-figurative'].includes(label.val)) {
 			if (!label.neg) {
 				values.push(label.val);
 			} else {
