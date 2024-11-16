@@ -36,9 +36,10 @@
 			display: flex;
 			flex-wrap: wrap;
 			justify-content: end;
+			align-items: baseline;
+			column-gap: 8px;
 			margin-top: 8px;
 			margin-bottom: 8px;
-			column-gap: 8px;
 		}
 
 		.profile {
@@ -180,7 +181,8 @@
 		</div>
 		<form class="profile-form">
 			<input class="profile" type="text" placeholder="https://bsky.app/profile/handle.bsky.social" />
-			<label><input class="show-hidden" type="checkbox">Show adult/hidden</label>
+			<label><input class="reverse" type="checkbox" />Oldest first</label>
+			<label><input class="show-hidden" type="checkbox" />Show adult/hidden</label>
 			<select class="display-method" title="Method to use to display posts.">
 				<option value="embed" title="Use embeded iframes from Bluesky. Slow.">Embed</option>
 				<option value="custom"
@@ -200,6 +202,7 @@
 let abortController = null;
 
 let profile;
+let reverse = false;
 let showHidden = false;
 let useEmbeds = true;
 let useCustom = false;
@@ -224,6 +227,7 @@ const main = async () => {
 		profile = parseProfile($('.profile').value);
 		if (profile == null) return;
 
+		reverse = $('.reverse').checked;
 		showHidden = $('.show-hidden').checked;
 
 		let displayMethod = $('.display-method').value;
@@ -299,7 +303,7 @@ const appendLikes = async (cursor) => {
 		collection: "app.bsky.feed.like",
 		...(cursor ? { cursor } : {}),
 		limit: 25,
-		// reverse: true,
+		reverse: reverse,
 	});
 
 	console.log(likes);
