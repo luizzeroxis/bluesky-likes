@@ -212,13 +212,34 @@ let useCustom = false;
 const main = async () => {
 	// Check query string
 	if (location.search != "") {
-		profile = location.search.slice(1);
-		$('.profile').value = profile;
+		let searchParams = new URLSearchParams(location.search);
 
-		profile = parseProfile(profile);
-		if (profile == null) return;
+		const setSearchBool = (name, previousValue, trueValue = 'true', falseValue = 'false') => {
+			let param = searchParams.get(name);
+			return param == trueValue ? true
+				: param == falseValue ? false
+				: previousValue;
+		}
 
-		await abortWrapper(load);
+		reverse = setSearchBool('reverse', reverse);
+		$('.reverse').checked = reverse;
+
+		showHidden = setSearchBool('showhidden', showHidden);
+		$('.show-hidden').checked = showHidden;
+
+		useEmbeds = setSearchBool('method', useEmbeds, 'embed', 'custom');
+		useCustom = setSearchBool('method', useCustom, 'custom', 'embed');
+		$('.display-method').value = useEmbeds ? 'embed' : useCustom ? 'custom' : null;
+
+		if (searchParams.has('profile')) {
+			profile = searchParams.get('profile');
+			$('.profile').value = profile;
+
+			profile = parseProfile(profile);
+			if (profile == null) return;
+
+			await abortWrapper(load);
+		}
 	}
 
 	$('.profile-form').onsubmit = async e => {
