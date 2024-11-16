@@ -286,7 +286,7 @@ const appendLikes = async (cursor) => {
 
 	let pageElem = $('.pages').appendChild(html("div", { class: "page" }));
 
-	let posts;
+	let posts = [];
 	if (useCustom) {
 		// likeRecord.value => app.bsky.feed.like
 		let postUris = likes.records
@@ -297,9 +297,11 @@ const appendLikes = async (cursor) => {
 
 		// app.bsky.feed.getPosts
 		// posts.posts[] => app.bsky.feed.defs#postView
-		posts = await apiRequest("https://public.api.bsky.app/xrpc/app.bsky.feed.getPosts", {
-			uris: postUris,
-		});
+		if (postUris.length > 0) {
+			posts = await apiRequest("https://public.api.bsky.app/xrpc/app.bsky.feed.getPosts", {
+				uris: postUris,
+			});
+		}
 
 		console.log(posts);
 	}
