@@ -527,8 +527,8 @@ const shouldHidePost = (post) => {
 	}
 
 	let values = [
-		...getHideLabelValues(post.author.labels),
-		...getHideLabelValues(post.labels),
+		...(post.author.labels ? getHideLabelValues(post.author.labels) : []),
+		...(post.labels ? getHideLabelValues(post.labels) : []),
 	];
 
 	if (values.length > 0) {
