@@ -437,11 +437,11 @@ const makePost = (post, record, embeds) => {
 
 	let hide = shouldHidePost(post);
 	if (hide) {
-		container1Elem.style.display = 'none';
+		container1Elem.style.setProperty('display', 'none');
 
 		let buttonElem = html('button', { class: 'show-post' }, `Show post (${hide})`);
 		buttonElem.addEventListener('click', () => {
-			container1Elem.style.display = 'block';
+			container1Elem.style.removeProperty('display');
 			buttonElem.remove();
 		});
 
@@ -510,18 +510,26 @@ const shouldHidePost = (post) => {
 	if (showHidden) return false;
 	if (!post.labels) return false;
 
-	let values = [];
-	for (let label of post.labels) {
-		if (['!hide', '!warn', '!no-unauthenticated', 'porn', 'sexual', 'graphic-media', 'nudity', 'sexual-figurative'].includes(label.val)) {
-			if (!label.neg) {
-				values.push(label.val);
+	const getHideLabelValues = (labels) => {
+		let values = [];
+		for (let label of labels) {
+			if (['!hide', '!warn', '!no-unauthenticated', 'porn', 'sexual', 'graphic-media', 'nudity', 'sexual-figurative'].includes(label.val)) {
+				if (!label.neg) {
+					values.push(label.val);
+				} else {
+					values = values.filter(x => x != label.val);
+				}
 			} else {
-				values = values.filter(x => x != label.val);
+				console.log(post, label);
 			}
-		} else {
-			console.log(post, label);
 		}
+		return values;
 	}
+
+	let values = [
+		...getHideLabelValues(post.author.labels),
+		...getHideLabelValues(post.labels),
+	];
 
 	if (values.length > 0) {
 		return values.join(", ");
