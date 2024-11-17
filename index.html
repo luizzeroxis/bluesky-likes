@@ -143,10 +143,18 @@
 		}
 
 		.post .embed-video a:hover {
-			outline: 1px solid gray;
+			outline: 1px solid #808080;
 		}
 
 		.post .embed-external {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+			padding-bottom: 8px;
+			border: 1px solid #808080;
+		}
+
+		.post .embed-external .title, .post .embed-external .description {
 			white-space-collapse: preserve;
 		}
 
@@ -467,8 +475,13 @@ const makePostEmbeds = (postEmbeds, post) => {
 				html('a', { href: toPostUri(post.uri), title: 'Video' }, html('img', { class: 'embed-thumbnail', src: postEmbed.thumbnail }))
 			);
 		} else if (postEmbed.$type == 'app.bsky.embed.external#view') {
-			return html('div', { class: 'embed-external' },
-				html('a', { href: postEmbed.external.uri }, postEmbed.external.title || postEmbed.external.uri));
+			return html('div', { class: 'embed-external' }, [
+				postEmbed.external.thumb ? html('a', { href: postEmbed.external.uri },
+					html('img', {class: 'embed-thumbnail', src: postEmbed.external.thumb})) : null,
+				html('a', { class: 'title', href: postEmbed.external.uri }, postEmbed.external.title),
+				html('div', { class: 'description' }, postEmbed.external.description),
+				html('a', { href: postEmbed.external.uri }, postEmbed.external.uri),
+			]);
 		} else if (postEmbed.$type == 'app.bsky.embed.record#view') {
 			return makeEmbedRecordView(postEmbed.record);
 		} else if (postEmbed.$type == 'app.bsky.embed.recordWithMedia#view') {
