@@ -215,6 +215,8 @@ let showHidden = false;
 let useEmbeds = true;
 let useCustom = false;
 
+let endpoint;
+
 // Main
 
 const main = async () => {
@@ -292,7 +294,37 @@ const load = async () => {
 
 	$('.pages').replaceChildren();
 
-	await appendLikesWithMore();
+	try {
+		$('.final').textContent = "Loading...";
+
+		let did = profile;
+		if (!profile.startsWith('did:')) {
+			let resolveHandleResult = await apiRequest("https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle", {
+				handle: profile,
+			});
+			console.log(resolveHandleResult);
+
+			did = resolveHandleResult.did;
+		}
+
+		let didInfo = await apiRequest("https://plc.directory/" + did);
+		console.log(didInfo);
+
+		if (!didInfo.service || !didInfo.service[0]) {
+			throw new NotOkError("Could not find service endpoint");
+		}
+
+		endpoint = didInfo.service[0].serviceEndpoint;
+		console.log(endpoint);
+
+		await appendLikesWithMore();
+	} catch (e) {
+		if (e instanceof NotOkError) {
+			$('.final').textContent = `Error when fetching likes: ${e.message}`;
+		} else {
+			throw e;
+		}
+	}
 }
 
 const appendLikesWithMore = async (cursor) => {
@@ -327,7 +359,7 @@ const appendLikesWithMore = async (cursor) => {
 
 const appendLikes = async (cursor) => {
 	// com.atproto.repo.listRecords
-	let likes = await apiRequest("https://bsky.social/xrpc/com.atproto.repo.listRecords", {
+	let likes = await apiRequest(endpoint + "/xrpc/com.atproto.repo.listRecords", {
 		repo: profile,
 		collection: "app.bsky.feed.like",
 		...(cursor ? { cursor } : {}),
@@ -555,13 +587,16 @@ const makeEmbed = (post) => {
 // Bluesky utils
 
 const apiRequest = async (endpoint, args) => {
-	args = Object.entries(args).flatMap(([k, v]) => {
-		if (Array.isArray(v)) {
-			return v.map(x => [k, x]);
-		}
-		return [[k, v]];
-	})
-	let url = endpoint + "?" + new URLSearchParams(args);
+	if (args) {
+		args = Object.entries(args).flatMap(([k, v]) => {
+			if (Array.isArray(v)) {
+				return v.map(x => [k, x]);
+			}
+			return [[k, v]];
+		});
+	}
+
+	let url = endpoint + (args ? "?" + new URLSearchParams(args) : "");
 	let res = await fetch(url, { signal: abortController.signal });
 	if (!res.ok) throw new NotOkError(`${res.status}`);
 	let json = await res.json();
