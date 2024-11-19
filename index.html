@@ -179,6 +179,8 @@
 		}
 
 		.final {
+			display: flex;
+			flex-direction: column;
 			text-align: center;
 			margin-top: 8px;
 			margin-bottom: 8px;
@@ -333,32 +335,35 @@ const load = async () => {
 }
 
 const appendLikesWithMore = async (cursor) => {
-	try {
-		$('.final').textContent = "Loading...";
+	$('.final').textContent = "Loading...";
 
-		cursor = await appendLikes(cursor);
+	cursor = await appendLikes(cursor);
 
-		if (cursor) {
-			let loadMoreLikesElem = html('button', {}, 'Load more likes');
-			loadMoreLikesElem.onclick = async () => {
-				await abortWrapper(async () => {
-					abortController.signal.addEventListener('abort', e => {
-						$('.final').textContent = "Request cancelled";
-					});
-
-					await appendLikesWithMore(cursor);
+	if (cursor) {
+		let loadMoreLikesElem = html('button', {}, 'Load more likes');
+		loadMoreLikesElem.onclick = async () => {
+			await abortWrapper(async () => {
+				abortController.signal.addEventListener('abort', e => {
+					$('.final').textContent = "Request cancelled";
 				});
-			};
-			$('.final').replaceChildren(loadMoreLikesElem);
-		} else {
-			$('.final').textContent = "End of likes";
-		}
-	} catch (e) {
-		if (e instanceof NotOkError) {
-			$('.final').textContent = `Error when fetching likes: ${e.message}`;
-		} else {
-			throw e;
-		}
+
+				try {
+					await appendLikesWithMore(cursor);
+				} catch (e) {
+					if (e instanceof NotOkError) {
+						$('.final').replaceChildren(
+							loadMoreLikesElem,
+							`Error when fetching likes: ${e.message}`
+						);
+					} else {
+						throw e;
+					}
+				}
+			});
+		};
+		$('.final').replaceChildren(loadMoreLikesElem);
+	} else {
+		$('.final').textContent = "End of likes";
 	}
 }
 
@@ -602,10 +607,18 @@ const apiRequest = async (endpoint, args) => {
 	}
 
 	let url = endpoint + (args ? "?" + new URLSearchParams(args) : "");
-	let res = await fetch(url, { signal: abortController.signal });
-	if (!res.ok) throw new NotOkError(`${res.status}`);
-	let json = await res.json();
-	return json;
+	try {
+		let res = await fetch(url, { signal: abortController.signal });
+		if (!res.ok) throw new NotOkError(`${res.status}`);
+		let json = await res.json();
+		return json;
+	} catch (e) {
+		if (e instanceof TypeError) {
+			console.log(e);
+			throw new NotOkError(`Request failed`);
+		}
+		throw e;
+	}
 }
 
 const toUserDate = (datetime) => datetime ? new Date(datetime).toLocaleString() : "Unknown time";
