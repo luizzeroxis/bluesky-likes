@@ -127,12 +127,34 @@
 		}
 
 		.post .embed-images {
-			display: flex;
+			display: grid;
+			gap: 2px;
 			align-items: center;
+			justify-items: center;
 		}
 
-		.post .embed-images a {
-			flex: 1;
+		.post .embed-images.size-1 {
+			grid-template-columns: 1fr;
+		}
+
+		.post .embed-images.size-2, .post .embed-images.size-3, .post .embed-images.size-4 {
+			grid-template-columns: 1fr 1fr;
+		}
+
+		.post .embed-images.size-2 .embed-thumbnail, .post .embed-images.size-3 .embed-thumbnail {
+			max-height: 300px;
+		}
+
+		.post .embed-images.size-3 a:not(:first-child) .embed-thumbnail {
+			max-height: 150px;
+		}
+
+		.post .embed-images.size-4 .embed-thumbnail {
+			max-height: 200px;
+		}
+
+		.post .embed-images.size-3 a:first-child {
+			grid-row: 1 / span 2;
 		}
 
 		.post .embed-video {
@@ -141,10 +163,17 @@
 
 		.post .embed-video a::after {
 			content: "▶︎";
+			display: flex;
+			align-items: center;
+			justify-content: center;
 			position: absolute;
 			top: 8px;
 			left: 8px;
+			width: 1.5em;
+			height: 1.5em;
 			opacity: 0.5;
+			background-color: black;
+			color: white;
 		}
 
 		.post .embed-video a:hover {
@@ -509,7 +538,13 @@ const makePostEmbeds = (postEmbeds, post) => {
 
 	return postEmbeds.flatMap(postEmbed => {
 		if (postEmbed.$type == 'app.bsky.embed.images#view') {
-			return html('div', { class: 'embed-images' }, postEmbed.images.map(image =>
+			let sizeClassName =
+				postEmbed.images.length == 1 ? 'size-1' :
+				postEmbed.images.length == 2 ? 'size-2' :
+				postEmbed.images.length == 3 ? 'size-3' :
+				'size-4';
+
+			return html('div', { class: 'embed-images ' + sizeClassName }, postEmbed.images.map(image =>
 				html('a', { href: image.fullsize }, html('img', { class: 'embed-thumbnail', src: image.thumb, alt: image.alt, title: image.alt }))
 			));
 		} else if (postEmbed.$type == 'app.bsky.embed.video#view') {
