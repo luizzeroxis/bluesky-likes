@@ -161,14 +161,26 @@
 			position: relative;
 		}
 
-		.post .embed-video a::after {
+		.post .embed-video video {
+			display: flex;
+			width: 100%;
+			max-height: 600px;
+		}
+
+		.post .embed-video .embed-video-thumbnail-wrapper {
+			width: fit-content;
+		}
+
+		.post .embed-video .embed-video-thumbnail-wrapper::after {
 			content: "▶︎";
+			font-size: 200%;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			position: absolute;
-			top: 8px;
-			left: 8px;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
 			width: 1.5em;
 			height: 1.5em;
 			opacity: 0.5;
@@ -176,7 +188,7 @@
 			color: white;
 		}
 
-		.post .embed-video a:hover {
+		.post .embed-video .embed-video-thumbnail-wrapper:hover {
 			outline: 1px solid #808080;
 		}
 
@@ -247,6 +259,8 @@
 			<div class="final"></div>
 		</div>
 	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
 
 	<script>
 let abortController = null;
@@ -568,9 +582,34 @@ const makePostEmbeds = (postEmbeds, post) => {
 				html('a', { href: image.fullsize }, html('img', { class: 'embed-thumbnail', src: image.thumb, alt: image.alt, title: image.alt }))
 			));
 		} else if (postEmbed.$type == 'app.bsky.embed.video#view') {
-			return html('div', { class: 'embed-video' },
-				html('a', { href: toPostUri(post.uri), title: 'Video' }, html('img', { class: 'embed-thumbnail', src: postEmbed.thumbnail }))
-			);
+			let thumbnailElem = html('div', {class: 'embed-video-thumbnail-wrapper'},
+				html('img', { class: 'embed-thumbnail', src: postEmbed.thumbnail }));
+
+			if (!Hls.isSupported()) {
+				return html('div', { class: 'embed-video' },
+					html('a', { href: toPostUri(post.uri), title: 'Video' }, thumbnailElem));
+			}
+
+			let embedVideoElem = html('div', { class: 'embed-video' }, thumbnailElem);
+
+			thumbnailElem.addEventListener('click', () => {
+				let hls = new Hls();
+				hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+					console.log(hls.currentLevel, data.levels);
+					hls.currentLevel = data.levels.length-1;
+				});
+				hls.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
+					console.log(event, data);
+				});
+				hls.loadSource(postEmbed.playlist);
+
+				let videoElem = html('video', {controls: true, autoplay: true, poster: postEmbed.thumbnail});
+				embedVideoElem.replaceChildren(videoElem);
+
+				hls.attachMedia(videoElem);
+			});
+
+			return embedVideoElem;
 		} else if (postEmbed.$type == 'app.bsky.embed.external#view') {
 			return html('div', { class: 'embed-external' }, [
 				postEmbed.external.thumb ? html('a', { href: postEmbed.external.uri },
