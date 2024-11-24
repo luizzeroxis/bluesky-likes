@@ -241,8 +241,9 @@
 			<strong>See other profile's likes on Bluesky</strong>
 			<a href="https://github.com/luizzeroxis/bluesky-likes/">Source code - GPLv3</a>
 		</div>
+
 		<form class="profile-form">
-			<input class="profile" type="text" placeholder="https://bsky.app/profile/handle.bsky.social" />
+			<input class="profile" type="text" placeholder="https://bsky.app/profile/handle.bsky.social" enterkeyhint="go"/>
 			<label><input class="reverse" type="checkbox" />Oldest first</label>
 			<label class="show-hidden-label" style="display: none"><input class="show-hidden" type="checkbox" />Show adult/hidden</label>
 			<select class="display-method" title="Method to use to display posts.">
@@ -251,9 +252,10 @@
 					title="Use my custom renderer. Faster, but may not accurately display some posts.">Custom</option>
 			</select>
 			<div>
-				<button class="show-likes">Show likes</button>
+				<input class="show-likes" type="submit" value="Show likes" />
 			</div>
 		</form>
+
 		<div class="posts">
 			<div class="pages"></div>
 			<div class="final"></div>
