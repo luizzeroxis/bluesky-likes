@@ -52,6 +52,15 @@
 			min-width: 0;
 		}
 
+		.about-dialog {
+			max-width: 600px;
+		}
+
+		.about-dialog>form {
+			display: flex;
+			justify-content: end;
+		}
+
 		.posts {
 			margin-top: 8px;
 			margin-bottom: 8px;
@@ -241,7 +250,7 @@
 	<div class="main">
 		<div class="header">
 			<strong>See other profile's likes on Bluesky</strong>
-			<a href="https://github.com/luizzeroxis/bluesky-likes/">Source code - GPLv3</a>
+			<a class="about" href="javascript:;">About</a>
 		</div>
 
 		<form class="profile-form">
@@ -261,6 +270,30 @@
 			<div class="pages"></div>
 			<div class="final"></div>
 		</div>
+
+		<dialog class="about-dialog">
+			<form method="dialog">
+				<input type="submit" value="❌︎" />
+			</form>
+
+			<h3>See other profile's likes on Bluesky</h3>
+
+			<p>Wanna view the Bluesky likes of another user? This website will allow you to check that using the official Bluesky API.</p>
+
+			<h4>Usage:</h4>
+
+			<p>In the main text box, input the profile you want. It can be a handle, a bsky.app profile URL or a DID. "https://" isn't needed. Select "Oldest first" if you want to see likes in reverse order. Select "Show adult/hidden" if you want labeled content to be shown by default (only in the custom method). Use the dropdown to select the method to display posts. "Embed" loads iframes from Bluesky that contain the posts, which can be very slow. "Custom" may not show all posts correctly, but it is faster, can show more information and can play videos directly on the page. Finally, click "Show likes" to apply all settings and load them up.</p>
+
+			<p>You can use query parameters to link directly to some profile's likes with some options: <code>profile</code> is the profile, <code>method</code> can be set to <code>embed</code> or <code>custom</code>, <code>showhidden</code> and <code>reverse</code> can be <code>true</code>. Example: <code>https://luizzeroxis.github.io/bluesky-likes?profile=luizzeroxis.bsky.social&method=custom&showhidden=true&reverse=true</code></p>
+
+			<h4>About:</h4>
+
+			<p>This website exists because for some reason the Bluesky official website doesn't show likes from other profiles, only your own, even though this is information that can be gathered using the API. There didn't seem to exist any website that used the API to show you that in a user interface, so I made it myself. I wonder what will happen to this website if they decide to add a likes tab on Bluesky?</p>
+
+			<p>Source code: <a href="https://github.com/luizzeroxis/bluesky-likes/">https://github.com/luizzeroxis/bluesky-likes/</a>. Licensed under the GNU General Public License Version 3. Uses <a href="https://github.com/video-dev/hls.js">hls.js</a>.</p>
+
+			<p>Visit my website for contact information: <a href="https://luizzeroxis.github.io/">https://luizzeroxis.github.io/</a></p>
+		</dialog>
 	</div>
 
 	<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
@@ -279,6 +312,10 @@ let endpoint;
 // Main
 
 const main = async () => {
+	$('.about').addEventListener('click', () => {
+		$('.about-dialog').showModal();
+	});
+
 	$('.display-method').addEventListener('change', () => {
 		updateDisplayMethodSelect();
 	});
