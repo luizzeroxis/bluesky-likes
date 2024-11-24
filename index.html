@@ -323,18 +323,19 @@ const main = async () => {
 		useEmbeds = setSearchBool('method', useEmbeds, 'embed', 'custom');
 		useCustom = setSearchBool('method', useCustom, 'custom', 'embed');
 		$('.display-method').value = useEmbeds ? 'embed' : useCustom ? 'custom' : null;
-		updateDisplayMethodSelect();
 
 		if (searchParams.has('profile')) {
 			profile = searchParams.get('profile');
 			$('.profile').value = profile;
 
 			profile = parseProfile(profile);
-			if (profile == null) return;
-
-			await abortWrapper(load);
+			if (profile != null) {
+				await abortWrapper(load);
+			}
 		}
 	}
+
+	updateDisplayMethodSelect();
 }
 
 const updateDisplayMethodSelect = () => {
