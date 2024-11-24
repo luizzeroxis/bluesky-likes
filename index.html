@@ -2,8 +2,7 @@
 
 <head>
 	<title>See other profile's likes on Bluesky</title>
-	<meta name="description"
-		content="Wanna view the Bluesky likes of another user? This website will allow you to check that using the official Bluesky API." />
+	<meta name="description" content="Wanna view the Bluesky likes of another user? This website will allow you to check that using the official Bluesky API." />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="color-scheme" content="light dark" />
 	<style>
@@ -137,11 +136,14 @@
 			grid-template-columns: 1fr;
 		}
 
-		.post .embed-images.size-2, .post .embed-images.size-3, .post .embed-images.size-4 {
+		.post .embed-images.size-2,
+		.post .embed-images.size-3,
+		.post .embed-images.size-4 {
 			grid-template-columns: 1fr 1fr;
 		}
 
-		.post .embed-images.size-2 .embed-thumbnail, .post .embed-images.size-3 .embed-thumbnail {
+		.post .embed-images.size-2 .embed-thumbnail,
+		.post .embed-images.size-3 .embed-thumbnail {
 			max-height: 300px;
 		}
 
@@ -198,7 +200,7 @@
 			border: 1px solid #808080;
 		}
 
-		.post .embed-external > .embed-external-text {
+		.post .embed-external>.embed-external-text {
 			display: flex;
 			flex-direction: column;
 			gap: 8px;
@@ -206,7 +208,7 @@
 			white-space-collapse: preserve;
 		}
 
-		.post .embed-external > .embed-external-text > .title {
+		.post .embed-external>.embed-external-text>.title {
 			font-weight: bold;
 		}
 
@@ -243,13 +245,12 @@
 		</div>
 
 		<form class="profile-form">
-			<input class="profile" type="text" placeholder="https://bsky.app/profile/handle.bsky.social" enterkeyhint="go"/>
+			<input class="profile" type="text" placeholder="https://bsky.app/profile/handle.bsky.social" enterkeyhint="go" />
 			<label><input class="reverse" type="checkbox" />Oldest first</label>
 			<label class="show-hidden-label" style="display: none"><input class="show-hidden" type="checkbox" />Show adult/hidden</label>
 			<select class="display-method" title="Method to use to display posts.">
 				<option value="embed" title="Use embeded iframes from Bluesky. Slow.">Embed</option>
-				<option value="custom"
-					title="Use my custom renderer. Faster, but may not accurately display some posts.">Custom</option>
+				<option value="custom" title="Use my custom renderer. Faster, but may not accurately display some posts.">Custom</option>
 			</select>
 			<div>
 				<input class="show-likes" type="submit" value="Show likes" />
@@ -585,7 +586,7 @@ const makePostEmbeds = (postEmbeds, post) => {
 				html('a', { href: image.fullsize }, html('img', { class: 'embed-thumbnail', src: image.thumb, alt: image.alt, title: image.alt }))
 			));
 		} else if (postEmbed.$type == 'app.bsky.embed.video#view') {
-			let thumbnailElem = html('div', {class: 'embed-video-thumbnail-wrapper'},
+			let thumbnailElem = html('div', { class: 'embed-video-thumbnail-wrapper' },
 				html('img', { class: 'embed-thumbnail', src: postEmbed.thumbnail }));
 
 			if (!Hls.isSupported()) {
@@ -599,14 +600,14 @@ const makePostEmbeds = (postEmbeds, post) => {
 				let hls = new Hls();
 				hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
 					console.log(hls.currentLevel, data.levels);
-					hls.currentLevel = data.levels.length-1;
+					hls.currentLevel = data.levels.length - 1;
 				});
 				hls.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
 					console.log(event, data);
 				});
 				hls.loadSource(postEmbed.playlist);
 
-				let videoElem = html('video', {controls: true, autoplay: true, poster: postEmbed.thumbnail});
+				let videoElem = html('video', { controls: true, autoplay: true, poster: postEmbed.thumbnail });
 				embedVideoElem.replaceChildren(videoElem);
 
 				hls.attachMedia(videoElem);
@@ -616,7 +617,7 @@ const makePostEmbeds = (postEmbeds, post) => {
 		} else if (postEmbed.$type == 'app.bsky.embed.external#view') {
 			return html('div', { class: 'embed-external' }, [
 				postEmbed.external.thumb ? html('a', { href: postEmbed.external.uri },
-					html('img', {class: 'embed-thumbnail', src: postEmbed.external.thumb})) : null,
+					html('img', { class: 'embed-thumbnail', src: postEmbed.external.thumb })) : null,
 				html('div', { class: 'embed-external-text' }, [
 					postEmbed.external.title != "" ? html('a', { class: 'title', href: postEmbed.external.uri }, postEmbed.external.title) : null,
 					postEmbed.external.description != "" ? html('div', { class: 'description' }, postEmbed.external.description) : null,
