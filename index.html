@@ -226,7 +226,7 @@
 		<form class="profile-form">
 			<input class="profile" type="text" placeholder="https://bsky.app/profile/handle.bsky.social" />
 			<label><input class="reverse" type="checkbox" />Oldest first</label>
-			<label><input class="show-hidden" type="checkbox" />Show adult/hidden</label>
+			<label class="show-hidden-label" style="display: none"><input class="show-hidden" type="checkbox" />Show adult/hidden</label>
 			<select class="display-method" title="Method to use to display posts.">
 				<option value="embed" title="Use embeded iframes from Bluesky. Slow.">Embed</option>
 				<option value="custom"
@@ -256,37 +256,9 @@ let endpoint;
 // Main
 
 const main = async () => {
-	// Check query string
-	if (location.search != "") {
-		let searchParams = new URLSearchParams(location.search);
-
-		const setSearchBool = (name, previousValue, trueValue = 'true', falseValue = 'false') => {
-			let param = searchParams.get(name);
-			return param == trueValue ? true
-				: param == falseValue ? false
-				: previousValue;
-		}
-
-		reverse = setSearchBool('reverse', reverse);
-		$('.reverse').checked = reverse;
-
-		showHidden = setSearchBool('showhidden', showHidden);
-		$('.show-hidden').checked = showHidden;
-
-		useEmbeds = setSearchBool('method', useEmbeds, 'embed', 'custom');
-		useCustom = setSearchBool('method', useCustom, 'custom', 'embed');
-		$('.display-method').value = useEmbeds ? 'embed' : useCustom ? 'custom' : null;
-
-		if (searchParams.has('profile')) {
-			profile = searchParams.get('profile');
-			$('.profile').value = profile;
-
-			profile = parseProfile(profile);
-			if (profile == null) return;
-
-			await abortWrapper(load);
-		}
-	}
+	$('.display-method').addEventListener('change', () => {
+		updateDisplayMethodSelect();
+	});
 
 	$('.profile-form').onsubmit = async e => {
 		e.preventDefault();
@@ -307,6 +279,48 @@ const main = async () => {
 		}
 
 		await abortWrapper(load);
+	};
+
+	// Check query string
+	if (location.search != "") {
+		let searchParams = new URLSearchParams(location.search);
+
+		const setSearchBool = (name, previousValue, trueValue = 'true', falseValue = 'false') => {
+			let param = searchParams.get(name);
+			return param == trueValue ? true
+				: param == falseValue ? false
+				: previousValue;
+		}
+
+		reverse = setSearchBool('reverse', reverse);
+		$('.reverse').checked = reverse;
+
+		showHidden = setSearchBool('showhidden', showHidden);
+		$('.show-hidden').checked = showHidden;
+
+		useEmbeds = setSearchBool('method', useEmbeds, 'embed', 'custom');
+		useCustom = setSearchBool('method', useCustom, 'custom', 'embed');
+		$('.display-method').value = useEmbeds ? 'embed' : useCustom ? 'custom' : null;
+		updateDisplayMethodSelect();
+
+		if (searchParams.has('profile')) {
+			profile = searchParams.get('profile');
+			$('.profile').value = profile;
+
+			profile = parseProfile(profile);
+			if (profile == null) return;
+
+			await abortWrapper(load);
+		}
+	}
+}
+
+const updateDisplayMethodSelect = () => {
+	// Show hidden does nothing on embed method
+	if ($('.display-method').value == 'embed') {
+		$('.show-hidden-label').style.setProperty('display', 'none');
+	} else {
+		$('.show-hidden-label').style.removeProperty('display');
 	}
 }
 
@@ -459,7 +473,7 @@ const appendLikes = async (cursor) => {
 			let reloadEmbedButton = html('button', { title: 'Reload embed' }, '🔄︎');
 			reloadEmbedButton.addEventListener('click', () => {
 				embed.replaceChildren(makeEmbed(likeRecord.value.subject));
-			})
+			});
 
 			likeLine1.append(
 				html('a', { href: toPostUri(likeRecord.value.subject.uri) }, 'Open on bsky.app'),
