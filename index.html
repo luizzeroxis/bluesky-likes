@@ -677,11 +677,23 @@ const makePostEmbeds = (postEmbeds, post) => {
 }
 
 const makeEmbedRecordView = (embedRecordView) => {
-	// TODO https://github.com/bluesky-social/atproto/blob/main/lexicons/app/bsky/embed/record.json
 	if (embedRecordView.$type == 'app.bsky.embed.record#viewRecord') {
 		return makePost(embedRecordView, embedRecordView.value, embedRecordView.embeds);
+	} else if (embedRecordView.$type == 'app.bsky.embed.record#viewNotFound') {
+		return html('div', { class: 'post' },
+			html('a', { href: toPostUri(embedRecordView.uri) }, `Not found`));
+	} else if (embedRecordView.$type == 'app.bsky.embed.record#viewBlocked') {
+		return html('div', { class: 'post' },
+			html('a', { href: toPostUri(embedRecordView.uri) }, `Blocked`));
+	} else if (embedRecordView.$type == 'app.bsky.embed.record#viewDetached') {
+		return html('div', { class: 'post' },
+			html('a', { href: toPostUri(embedRecordView.uri) }, `Detached`));
+	// } else if (embedRecordView.$type == 'app.bsky.feed.defs#generatorView') {
+	// } else if (embedRecordView.$type == 'app.bsky.graph.defs#listView') {
+	// } else if (embedRecordView.$type == 'app.bsky.labeler.defs#labelerView') {
+	// } else if (embedRecordView.$type == 'app.bsky.graph.defs#starterPackViewBasic') {
 	} else {
-		return html('div', {}, `Unsupported record view type ${embedRecordView.$type}`);
+		return html('div', { class: 'post' }, `Unsupported record view type ${embedRecordView.$type}`);
 	}
 }
 
