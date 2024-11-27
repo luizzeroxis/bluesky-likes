@@ -418,7 +418,12 @@ const load = async () => {
 			did = resolveHandleResult.did;
 		}
 
-		let didInfo = await apiRequest("https://plc.directory/" + did);
+		let didInfo;
+		if (did.startsWith('did:web:')) {
+			didInfo = await apiRequest(`https://${did.slice('did:web:'.length)}/.well-known/did.json`);
+		} else {
+			didInfo = await apiRequest("https://plc.directory/" + did);
+		}
 		console.log(didInfo);
 
 		if (!didInfo.service || !didInfo.service[0]) {
