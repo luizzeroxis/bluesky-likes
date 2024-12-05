@@ -302,45 +302,46 @@
 let abortController = null;
 
 let profile;
-let reverse = false;
-let showHidden = false;
-let useEmbeds = true;
-let useCustom = false;
-
 let did;
 let endpoint;
 
+let settings = {
+	reverse: false,
+	showHidden: false,
+	useEmbeds: true,
+	useCustom: false,
+};
+
 // Main
 
-const main = async () => {
+const main = () => {
 	$('.about').addEventListener('click', () => {
 		$('.about-dialog').showModal();
 	});
 
+	$('.reverse').addEventListener('input', () => {
+		updateSettings();
+	})
+
+	$('.show-hidden').addEventListener('input', () => {
+		updateSettings();
+	})
+
 	$('.display-method').addEventListener('change', () => {
-		updateDisplayMethodSelect();
+		updateSettings();
 	});
 
-	$('.profile-form').onsubmit = async e => {
+	$('.profile-form').onsubmit = e => {
 		e.preventDefault();
 
 		profile = parseProfile($('.profile').value);
 		if (profile == null) return;
 
-		reverse = $('.reverse').checked;
-		showHidden = $('.show-hidden').checked;
-
-		let displayMethod = $('.display-method').value;
-		if (displayMethod == 'embed') {
-			useEmbeds = true;
-			useCustom = false;
-		} else if (displayMethod == 'custom') {
-			useEmbeds = false;
-			useCustom = true;
-		}
-
-		await abortWrapper(load);
+		abortWrapper(load);
 	};
+
+	loadSettings();
+	saveSettings();
 
 	// Check query string
 	if (location.search != "") {
@@ -353,28 +354,65 @@ const main = async () => {
 				: previousValue;
 		}
 
-		reverse = setSearchBool('reverse', reverse);
-		$('.reverse').checked = reverse;
-
-		showHidden = setSearchBool('showhidden', showHidden);
-		$('.show-hidden').checked = showHidden;
-
-		useEmbeds = setSearchBool('method', useEmbeds, 'embed', 'custom');
-		useCustom = setSearchBool('method', useCustom, 'custom', 'embed');
-		$('.display-method').value = useEmbeds ? 'embed' : useCustom ? 'custom' : null;
+		settings.reverse = setSearchBool('reverse', settings.reverse);
+		settings.showHidden = setSearchBool('showhidden', settings.showHidden);
+		settings.useEmbeds = setSearchBool('method', settings.useEmbeds, 'embed', 'custom');
+		settings.useCustom = setSearchBool('method', settings.useCustom, 'custom', 'embed');
 
 		if (searchParams.has('profile')) {
 			profile = searchParams.get('profile');
 			$('.profile').value = profile;
 
 			profile = parseProfile(profile);
-			if (profile != null) {
-				await abortWrapper(load);
-			}
 		}
 	}
 
+	applySettings();
+
+	if (profile != null) {
+		abortWrapper(load);
+	}
+}
+
+const loadSettings = () => {
+	let settingsStored = localStorage.getItem("settings");
+	if (settingsStored) {
+		settingsStored = JSON.parse(settingsStored);
+		for (let key of Object.keys(settingsStored)) {
+			settings[key] = settingsStored[key] ?? setings[key];
+		}
+	}
+}
+
+const updateSettings = () => {
+	settings.reverse = $('.reverse').checked;
+	settings.showHidden = $('.show-hidden').checked;
+
+	let displayMethod = $('.display-method').value;
+	if (displayMethod == 'embed') {
+		settings.useEmbeds = true;
+		settings.useCustom = false;
+	} else if (displayMethod == 'custom') {
+		settings.useEmbeds = false;
+		settings.useCustom = true;
+	}
+
 	updateDisplayMethodSelect();
+
+	saveSettings();
+}
+
+const applySettings = () => {
+	$('.reverse').checked = settings.reverse;
+	$('.show-hidden').checked = settings.showHidden;
+	$('.display-method').value = settings.useEmbeds ? 'embed' : settings.useCustom ? 'custom' : null;
+
+	updateDisplayMethodSelect();
+}
+
+const saveSettings = () => {
+	// Save settings
+	localStorage.setItem("settings", JSON.stringify(settings));
 }
 
 const updateDisplayMethodSelect = () => {
@@ -484,7 +522,7 @@ const appendLikes = async (cursor) => {
 		collection: "app.bsky.feed.like",
 		...(cursor ? { cursor } : {}),
 		limit: 25,
-		reverse: reverse,
+		reverse: settings.reverse,
 	});
 
 	console.log(likes);
@@ -492,7 +530,7 @@ const appendLikes = async (cursor) => {
 	let pageElem = $('.pages').appendChild(html("div", { class: "page" }));
 
 	let posts = [];
-	if (useCustom) {
+	if (settings.useCustom) {
 		// likeRecord.value => app.bsky.feed.like
 		let postUris = likes.records
 			.map(likeRecord => likeRecord.value.subject.uri)
@@ -518,7 +556,7 @@ const appendLikes = async (cursor) => {
 			html('div', { class: 'liked-at' }, `Liked at ${toUserDate(likeRecord.value.createdAt)}:`),
 		]));
 
-		if (useCustom) {
+		if (settings.useCustom) {
 			let post = posts.posts.find(post => post.uri == likeRecord.value.subject.uri);
 			let collection = parseUri(likeRecord.value.subject.uri).collection;
 
@@ -533,7 +571,7 @@ const appendLikes = async (cursor) => {
 				likeElem.append(html('div', { class: 'post' }, `Unsupported collection type ${likeRecord.value.subject.uri}`));
 			}
 		}
-		if (useEmbeds) {
+		if (settings.useEmbeds) {
 			let uri = parseUri(likeRecord.value.subject.uri);
 			let embed = likeElem.appendChild(makeEmbed(likeRecord.value.subject));
 
@@ -704,7 +742,7 @@ const makeEmbedRecordView = (embedRecordView) => {
 }
 
 const shouldHidePost = (post) => {
-	if (showHidden) return false;
+	if (settings.showHidden) return false;
 	if (!post.labels) return false;
 
 	const getHideLabelValues = (labels) => {
