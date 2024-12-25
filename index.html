@@ -437,6 +437,8 @@ const parseProfile = (input) => {
 	return input;
 }
 
+// Load
+
 const load = async () => {
 	abortController.signal.addEventListener('abort', e => {
 		$('.final').textContent = "Request cancelled";
@@ -553,7 +555,7 @@ const appendLikes = async (cursor) => {
 		let likeElem = pageElem.appendChild(html('div', { class: "like" }));
 
 		let likeLine1 = likeElem.appendChild(html('div', { class: 'like-line-1' }, [
-			html('div', { class: 'liked-at' }, `Liked at ${toUserDate(likeRecord.value.createdAt)}:`),
+			html('div', { class: 'liked-at' }, `Liked on ${toUserDate(likeRecord.value.createdAt)}:`),
 		]));
 
 		if (settings.useCustom) {
