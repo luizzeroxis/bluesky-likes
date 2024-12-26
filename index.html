@@ -257,6 +257,7 @@
 
 		<form class="profile-form">
 			<input class="profile" type="text" placeholder="https://bsky.app/profile/handle.bsky.social" enterkeyhint="go" />
+			<label><input class="infinite-scroll" type="checkbox" />Infinite scroll</label>
 			<label><input class="reverse" type="checkbox" />Oldest first</label>
 			<label class="show-hidden-label" style="display: none"><input class="show-hidden" type="checkbox" />Show adult/hidden</label>
 			<select class="display-method" title="Method to use to display posts.">
@@ -307,19 +308,35 @@ let profile;
 let did;
 let endpoint;
 
+let currentCursor = null;
+let currentLoadMoreLikesElem = null;
+
 let settings = {
 	reverse: false,
 	showHidden: false,
 	useEmbeds: true,
 	useCustom: false,
+	infiniteScroll: false,
 };
 
 // Main
 
 const main = () => {
+	window.addEventListener('resize', e => {
+		appendLikesWithMoreInfiniteScroll();
+	});
+
+	document.addEventListener('scroll', e => {
+		appendLikesWithMoreInfiniteScroll();
+	});
+
 	$('.about').addEventListener('click', () => {
 		$('.about-dialog').showModal();
 	});
+
+	$('.infinite-scroll').addEventListener('input', () => {
+		updateSettings();
+	})
 
 	$('.reverse').addEventListener('input', () => {
 		updateSettings();
@@ -339,7 +356,7 @@ const main = () => {
 		profile = parseProfile($('.profile').value);
 		if (profile == null) return;
 
-		abortWrapper(load);
+		load();
 	};
 
 	loadSettings();
@@ -356,6 +373,7 @@ const main = () => {
 				: previousValue;
 		}
 
+		settings.infiniteScroll = setSearchBool('infinitescroll', settings.infiniteScroll);
 		settings.reverse = setSearchBool('reverse', settings.reverse);
 		settings.showHidden = setSearchBool('showhidden', settings.showHidden);
 		settings.useEmbeds = setSearchBool('method', settings.useEmbeds, 'embed', 'custom');
@@ -372,7 +390,7 @@ const main = () => {
 	applySettings();
 
 	if (profile != null) {
-		abortWrapper(load);
+		load();
 	}
 }
 
@@ -387,6 +405,7 @@ const loadSettings = () => {
 }
 
 const updateSettings = () => {
+	settings.infiniteScroll = $('.infinite-scroll').checked;
 	settings.reverse = $('.reverse').checked;
 	settings.showHidden = $('.show-hidden').checked;
 
@@ -405,6 +424,7 @@ const updateSettings = () => {
 }
 
 const applySettings = () => {
+	$('.infinite-scroll').checked = settings.infiniteScroll;
 	$('.reverse').checked = settings.reverse;
 	$('.show-hidden').checked = settings.showHidden;
 	$('.display-method').value = settings.useEmbeds ? 'embed' : settings.useCustom ? 'custom' : null;
@@ -442,80 +462,98 @@ const parseProfile = (input) => {
 // Load
 
 const load = async () => {
-	abortController.signal.addEventListener('abort', e => {
-		$('.final').textContent = "Request cancelled";
+	await abortWrapper(async () => {
+		abortController.signal.addEventListener('abort', e => {
+			$('.final').textContent = "Request cancelled";
+		});
+
+		currentCursor = null;
+		currentLoadMoreLikesElem = null;
+
+		$('.pages').replaceChildren();
+
+		try {
+			$('.final').textContent = "Loading...";
+
+			did = profile;
+			if (!profile.startsWith('did:')) {
+				let resolveHandleResult = await apiRequest("https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle", {
+					handle: profile,
+				});
+				console.log(resolveHandleResult);
+
+				did = resolveHandleResult.did;
+			}
+
+			let didInfo;
+			if (did.startsWith('did:web:')) {
+				didInfo = await apiRequest(`https://${did.slice('did:web:'.length)}/.well-known/did.json`);
+			} else {
+				didInfo = await apiRequest("https://plc.directory/" + did);
+			}
+			console.log(didInfo);
+
+			if (!didInfo.service || !didInfo.service[0]) {
+				throw new NotOkError("Could not find service endpoint");
+			}
+
+			endpoint = didInfo.service[0].serviceEndpoint;
+			console.log(endpoint);
+
+			await appendLikesWithMoreInternal();
+		} catch (e) {
+			if (e instanceof NotOkError) {
+				$('.final').textContent = `Error when fetching likes: ${e.message}`;
+			} else {
+				throw e;
+			}
+		}
 	});
+}
 
-	$('.pages').replaceChildren();
+const appendLikesWithMore = async () => {
+	await abortWrapper(async () => {
+		abortController.signal.addEventListener('abort', e => {
+			$('.final').textContent = "Request cancelled";
+		});
 
-	try {
-		$('.final').textContent = "Loading...";
-
-		did = profile;
-		if (!profile.startsWith('did:')) {
-			let resolveHandleResult = await apiRequest("https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle", {
-				handle: profile,
-			});
-			console.log(resolveHandleResult);
-
-			did = resolveHandleResult.did;
+		try {
+			await appendLikesWithMoreInternal();
+		} catch (e) {
+			if (e instanceof NotOkError) {
+				$('.final').replaceChildren(
+					currentLoadMoreLikesElem,
+					`Error when fetching likes: ${e.message}`
+				);
+			} else {
+				throw e;
+			}
 		}
+	});
+}
 
-		let didInfo;
-		if (did.startsWith('did:web:')) {
-			didInfo = await apiRequest(`https://${did.slice('did:web:'.length)}/.well-known/did.json`);
-		} else {
-			didInfo = await apiRequest("https://plc.directory/" + did);
-		}
-		console.log(didInfo);
+const appendLikesWithMoreInternal = async () => {
+	$('.final').textContent = "Loading...";
 
-		if (!didInfo.service || !didInfo.service[0]) {
-			throw new NotOkError("Could not find service endpoint");
-		}
+	currentCursor = await appendLikes(currentCursor);
 
-		endpoint = didInfo.service[0].serviceEndpoint;
-		console.log(endpoint);
-
-		await appendLikesWithMore();
-	} catch (e) {
-		if (e instanceof NotOkError) {
-			$('.final').textContent = `Error when fetching likes: ${e.message}`;
-		} else {
-			throw e;
-		}
+	if (currentCursor) {
+		currentLoadMoreLikesElem = html('button', {}, 'Load more likes');
+		currentLoadMoreLikesElem.onclick = async () => {
+			await appendLikesWithMore();
+		};
+		$('.final').replaceChildren(currentLoadMoreLikesElem);
+	} else {
+		$('.final').textContent = "End of likes";
 	}
 }
 
-const appendLikesWithMore = async (cursor) => {
-	$('.final').textContent = "Loading...";
+const appendLikesWithMoreInfiniteScroll = () => {
+	if (!settings.infiniteScroll || currentCursor == null || abortController != null) return;
 
-	cursor = await appendLikes(cursor);
-
-	if (cursor) {
-		let loadMoreLikesElem = html('button', {}, 'Load more likes');
-		loadMoreLikesElem.onclick = async () => {
-			await abortWrapper(async () => {
-				abortController.signal.addEventListener('abort', e => {
-					$('.final').textContent = "Request cancelled";
-				});
-
-				try {
-					await appendLikesWithMore(cursor);
-				} catch (e) {
-					if (e instanceof NotOkError) {
-						$('.final').replaceChildren(
-							loadMoreLikesElem,
-							`Error when fetching likes: ${e.message}`
-						);
-					} else {
-						throw e;
-					}
-				}
-			});
-		};
-		$('.final').replaceChildren(loadMoreLikesElem);
-	} else {
-		$('.final').textContent = "End of likes";
+	if ((window.scrollY + window.innerHeight) >= (document.body.offsetHeight - 1000)) {
+		console.log('Infinite scroll load');
+		appendLikesWithMore();
 	}
 }
 
