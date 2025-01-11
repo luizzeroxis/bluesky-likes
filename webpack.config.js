@@ -59,6 +59,22 @@ const langs = [
 				"Visite meu site para informações de contato: <a href=\"https://luizzeroxis.github.io/\">https://luizzeroxis.github.io/</a>",
 		},
 		strsJS: {
+			"hidden":
+				"ocultado",
+			"has warning":
+				"com aviso",
+			"don't show to logged-out users":
+				"não mostrar para usuários desconectados",
+			"adult content":
+				"conteúdo adulto",
+			"sexually suggestive":
+				"sexualmente sugestivo",
+			"graphic media":
+				"conteúdo gráfico",
+			"non-sexual nudity":
+				"nudez não-erótica",
+			"sexually suggestive (cartoon)":
+				"sexualmente sugestivo (desenho)",
 			"Request cancelled":
 				"Requisição cancelada",
 			"Loading...":

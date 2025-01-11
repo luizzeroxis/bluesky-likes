@@ -1,5 +1,8 @@
 let abortController = null;
 
+let langData;
+let knownLabels;
+
 let profile;
 let did;
 let endpoint;
@@ -15,12 +18,21 @@ let settings = {
 	infiniteScroll: false,
 };
 
-let langData;
-
 // Main
 
 const main = () => {
 	langData = JSON.parse($('.lang-data').textContent);
+
+	knownLabels = {
+		'!hide': t(`hidden`),
+		'!warn': t(`has warning`),
+		'!no-unauthenticated': t(`don't show to logged-out users`),
+		'porn': t(`adult content`),
+		'sexual': t(`sexually suggestive`),
+		'graphic-media': t(`graphic media`),
+		'nudity': t(`non-sexual nudity`),
+		'sexual-figurative': t(`sexually suggestive (cartoon)`),
+	}
 
 	window.addEventListener('resize', e => {
 		appendLikesWithMoreInfiniteScroll();
@@ -386,7 +398,7 @@ const makePost = (post, record, embeds) => {
 	if (hide) {
 		container1Elem.style.setProperty('display', 'none');
 
-		let buttonElem = html('button', { class: 'show-post' }, t(`Show post`) + ` (${hide})`);
+		let buttonElem = html('button', { class: 'show-post' }, t(`Show post`) + ` (${getLabelsDescription(hide)})`);
 		buttonElem.addEventListener('click', () => {
 			container1Elem.style.removeProperty('display');
 			buttonElem.remove();
@@ -505,7 +517,7 @@ const shouldHidePost = (post) => {
 	const getHideLabelValues = (labels) => {
 		let values = [];
 		for (let label of labels) {
-			if (['!hide', '!warn', '!no-unauthenticated', 'porn', 'sexual', 'graphic-media', 'nudity', 'sexual-figurative'].includes(label.val)) {
+			if (Object.keys(knownLabels).includes(label.val)) {
 				if (!label.neg) {
 					values.push(label.val);
 				} else {
@@ -524,7 +536,7 @@ const shouldHidePost = (post) => {
 	];
 
 	if (values.length > 0) {
-		return values.join(", ");
+		return values;
 	}
 
 	return false;
@@ -626,6 +638,10 @@ const toPostUri = (uri) => {
 
 const toTagUri = (tag) => {
 	return `https://bsky.app/tag/${tag}`;
+}
+
+const getLabelsDescription = (labels) => {
+	return labels.map(label => knownLabels[label]).join(", ");
 }
 
 // Helpers
