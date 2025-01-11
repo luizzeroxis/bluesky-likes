@@ -1,307 +1,3 @@
-<!DOCTYPE html>
-
-<head>
-	<title>See other profile's likes on Bluesky</title>
-	<meta name="description" content="Wanna view the Bluesky likes of another user? This website will allow you to check that using the official Bluesky API." />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<meta name="color-scheme" content="light dark" />
-	<style>
-		body {
-			overflow-wrap: anywhere;
-		}
-
-		a {
-			text-decoration: none;
-		}
-
-		a:hover {
-			text-decoration: underline;
-		}
-
-		label {
-			display: flex;
-			align-items: center;
-		}
-
-		.main {
-			font-family: sans-serif;
-			font-size: 10pt;
-			margin: 0 auto;
-			max-width: 600px;
-		}
-
-		.header {
-			display: flex;
-			flex-wrap: wrap;
-			justify-content: space-between;
-		}
-
-		.profile-form {
-			display: flex;
-			flex-wrap: wrap;
-			justify-content: end;
-			align-items: center;
-			column-gap: 8px;
-			margin-top: 8px;
-			margin-bottom: 8px;
-		}
-
-		.profile {
-			flex: 1;
-			flex-basis: 100%;
-			min-width: 0;
-		}
-
-		.about-dialog {
-			max-width: 600px;
-		}
-
-		.about-dialog>form {
-			display: flex;
-			justify-content: end;
-		}
-
-		.posts {
-			margin-top: 8px;
-			margin-bottom: 8px;
-		}
-
-		.like .like-line-1 {
-			display: flex;
-			flex-wrap: wrap;
-			align-items: center;
-			gap: 8px;
-			margin-top: 8px;
-			margin-bottom: 8px;
-		}
-
-		.like .like-line-1 *:first-child {
-			flex: 1;
-			flex-basis: auto;
-		}
-
-		.post {
-			border: 1px solid #808080;
-			padding: 8px;
-		}
-
-		.post .show-post {
-			width: 100%;
-		}
-
-		.post .container-1 {
-			display: flex;
-			flex-direction: column;
-			gap: 8px;
-		}
-
-		.post .reply-info {}
-
-		.post .container-avatar-main {
-			display: flex;
-			gap: 8px;
-		}
-
-		.post .container-avatar-main>.column-avatar {
-			width: 32px;
-		}
-
-		.post .container-avatar-main>.column-main {
-			flex: 1;
-			display: flex;
-			flex-direction: column;
-			gap: 8px;
-		}
-
-		.post .avatar {
-			width: 32px;
-			height: 32px;
-		}
-
-		.post .line-1 {
-			display: flex;
-			flex-wrap: wrap;
-			align-items: baseline;
-			gap: 8px;
-		}
-
-		.post .line-1 .display-name {
-			white-space-collapse: preserve;
-			font-weight: bold;
-		}
-
-		.post .text {
-			white-space-collapse: preserve;
-		}
-
-		.post .embed-images {
-			display: grid;
-			gap: 2px;
-			align-items: center;
-			justify-items: center;
-		}
-
-		.post .embed-images.size-1 {
-			grid-template-columns: 1fr;
-		}
-
-		.post .embed-images.size-2,
-		.post .embed-images.size-3,
-		.post .embed-images.size-4 {
-			grid-template-columns: 1fr 1fr;
-		}
-
-		.post .embed-images.size-2 .embed-thumbnail,
-		.post .embed-images.size-3 .embed-thumbnail {
-			max-height: 300px;
-		}
-
-		.post .embed-images.size-3 a:not(:first-child) .embed-thumbnail {
-			max-height: 150px;
-		}
-
-		.post .embed-images.size-4 .embed-thumbnail {
-			max-height: 200px;
-		}
-
-		.post .embed-images.size-3 a:first-child {
-			grid-row: 1 / span 2;
-		}
-
-		.post .embed-video {
-			display: flex;
-			justify-content: center;
-			position: relative;
-		}
-
-		.post .embed-video video {
-			display: flex;
-			width: 100%;
-			max-height: 600px;
-		}
-
-		.post .embed-video .embed-video-thumbnail-wrapper {
-			width: fit-content;
-		}
-
-		.post .embed-video .embed-video-thumbnail-wrapper::after {
-			content: "▶︎";
-			font-size: 200%;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-			width: 1.5em;
-			height: 1.5em;
-			opacity: 0.5;
-			background-color: black;
-			color: white;
-		}
-
-		.post .embed-video .embed-video-thumbnail-wrapper:hover {
-			outline: 1px solid #808080;
-		}
-
-		.post .embed-external {
-			display: flex;
-			flex-direction: column;
-			border: 1px solid #808080;
-		}
-
-		.post .embed-external>.embed-external-text {
-			display: flex;
-			flex-direction: column;
-			gap: 8px;
-			margin: 8px;
-			white-space-collapse: preserve;
-		}
-
-		.post .embed-external>.embed-external-text>.title {
-			font-weight: bold;
-		}
-
-		.post .embed-thumbnail {
-			display: block;
-			max-height: 600px;
-			max-width: 100%;
-		}
-
-		.post .line-counts {
-			display: flex;
-			flex-wrap: wrap;
-		}
-
-		.post .line-counts div {
-			flex: 1;
-		}
-
-		.final {
-			display: flex;
-			flex-direction: column;
-			text-align: center;
-			margin-top: 8px;
-			margin-bottom: 8px;
-		}
-	</style>
-</head>
-
-<body>
-	<div class="main">
-		<div class="header">
-			<strong>See other profile's likes on Bluesky</strong>
-			<a class="about" href="javascript:;">About</a>
-		</div>
-
-		<form class="profile-form">
-			<input class="profile" type="text" placeholder="https://bsky.app/profile/handle.bsky.social" enterkeyhint="go" />
-			<label><input class="infinite-scroll" type="checkbox" />Infinite scroll</label>
-			<label><input class="reverse" type="checkbox" />Oldest first</label>
-			<label class="show-hidden-label" style="display: none"><input class="show-hidden" type="checkbox" />Show adult/hidden</label>
-			<select class="display-method" title="Method to use to display posts.">
-				<option value="embed" title="Use embeded iframes from Bluesky. Slow.">Embed</option>
-				<option value="custom" title="Use my custom renderer. Faster, but may not accurately display some posts.">Custom</option>
-			</select>
-			<div>
-				<input class="show-likes" type="submit" value="Show likes" />
-			</div>
-		</form>
-
-		<div class="posts">
-			<div class="pages"></div>
-			<div class="final"></div>
-		</div>
-
-		<dialog class="about-dialog">
-			<form method="dialog">
-				<input type="submit" value="❌︎" />
-			</form>
-
-			<h3>See other profile's likes on Bluesky</h3>
-
-			<p>Wanna view the Bluesky likes of another user? This website will allow you to check that using the official Bluesky API.</p>
-
-			<h4>Usage:</h4>
-
-			<p>In the main text box, input the profile you want. It can be a handle, a bsky.app profile URL or a DID. "https://" isn't needed. Select "Oldest first" if you want to see likes in reverse order. Select "Show adult/hidden" if you want labeled content to be shown by default (only in the custom method). Use the dropdown to select the method to display posts. "Embed" loads iframes from Bluesky that contain the posts, which can be very slow. "Custom" may not show all posts correctly, but it is faster, can show more information and can play videos directly on the page. Finally, click "Show likes" to apply all settings and load them up.</p>
-
-			<p>You can use query parameters to link directly to some profile's likes with some options: <code>profile</code> is the profile, <code>method</code> can be set to <code>embed</code> or <code>custom</code>, <code>showhidden</code> and <code>reverse</code> can be <code>true</code>. Example: <code>https://luizzeroxis.github.io/bluesky-likes?profile=luizzeroxis.bsky.social&method=custom&showhidden=true&reverse=true</code></p>
-
-			<h4>About:</h4>
-
-			<p>This website exists because for some reason the Bluesky official website doesn't show likes from other profiles, only your own, even though this is information that can be gathered using the API. There didn't seem to exist any website that used the API to show you that in a user interface, so I made it myself. I wonder what will happen to this website if they decide to add a likes tab on Bluesky?</p>
-
-			<p>Source code: <a href="https://github.com/luizzeroxis/bluesky-likes/">https://github.com/luizzeroxis/bluesky-likes/</a>. Licensed under the GNU General Public License Version 3. Uses <a href="https://github.com/video-dev/hls.js">hls.js</a>.</p>
-
-			<p>Visit my website for contact information: <a href="https://luizzeroxis.github.io/">https://luizzeroxis.github.io/</a></p>
-		</dialog>
-	</div>
-
-	<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
-
-	<script>
 let abortController = null;
 
 let profile;
@@ -319,9 +15,13 @@ let settings = {
 	infiniteScroll: false,
 };
 
+let langData;
+
 // Main
 
 const main = () => {
+	langData = JSON.parse($('.lang-data').textContent);
+
 	window.addEventListener('resize', e => {
 		appendLikesWithMoreInfiniteScroll();
 	});
@@ -394,6 +94,21 @@ const main = () => {
 	}
 }
 
+const t = (str, arg) => {
+	let trans = str;
+
+	if (langData.name != "en") {
+		trans = langData.strs[str];
+
+		if (!trans) {
+			console.error(`No translation for string ${str} for language ${langData.name}`);
+			trans = str;
+		}
+	}
+
+	return trans.replaceAll('~1', arg);
+}
+
 const loadSettings = () => {
 	let settingsStored = localStorage.getItem("settings");
 	if (settingsStored) {
@@ -464,7 +179,7 @@ const parseProfile = (input) => {
 const load = async () => {
 	await abortWrapper(async () => {
 		abortController.signal.addEventListener('abort', e => {
-			$('.final').textContent = "Request cancelled";
+			$('.final').textContent = t(`Request cancelled`);
 		});
 
 		currentCursor = null;
@@ -473,7 +188,7 @@ const load = async () => {
 		$('.pages').replaceChildren();
 
 		try {
-			$('.final').textContent = "Loading...";
+			$('.final').textContent = t(`Loading...`);
 
 			did = profile;
 			if (!profile.startsWith('did:')) {
@@ -494,7 +209,7 @@ const load = async () => {
 			console.log(didInfo);
 
 			if (!didInfo.service || !didInfo.service[0]) {
-				throw new NotOkError("Could not find service endpoint");
+				throw new NotOkError(t(`Could not find service endpoint`));
 			}
 
 			endpoint = didInfo.service[0].serviceEndpoint;
@@ -503,7 +218,7 @@ const load = async () => {
 			await appendLikesWithMoreInternal();
 		} catch (e) {
 			if (e instanceof NotOkError) {
-				$('.final').textContent = `Error when fetching likes: ${e.message}`;
+				$('.final').textContent = t(`Error when fetching likes:`) + ` ${e.message}`;
 			} else {
 				throw e;
 			}
@@ -514,7 +229,7 @@ const load = async () => {
 const appendLikesWithMore = async () => {
 	await abortWrapper(async () => {
 		abortController.signal.addEventListener('abort', e => {
-			$('.final').textContent = "Request cancelled";
+			$('.final').textContent = t(`Request cancelled`);
 		});
 
 		try {
@@ -523,7 +238,7 @@ const appendLikesWithMore = async () => {
 			if (e instanceof NotOkError) {
 				$('.final').replaceChildren(
 					currentLoadMoreLikesElem,
-					`Error when fetching likes: ${e.message}`
+					t(`Error when fetching likes:`) + ` ${e.message}`
 				);
 			} else {
 				throw e;
@@ -533,18 +248,18 @@ const appendLikesWithMore = async () => {
 }
 
 const appendLikesWithMoreInternal = async () => {
-	$('.final').textContent = "Loading...";
+	$('.final').textContent = t(`Loading...`);
 
 	currentCursor = await appendLikes(currentCursor);
 
 	if (currentCursor) {
-		currentLoadMoreLikesElem = html('button', {}, 'Load more likes');
+		currentLoadMoreLikesElem = html('button', {}, t(`Load more likes`));
 		currentLoadMoreLikesElem.onclick = async () => {
 			await appendLikesWithMore();
 		};
 		$('.final').replaceChildren(currentLoadMoreLikesElem);
 	} else {
-		$('.final').textContent = "End of likes";
+		$('.final').textContent = t(`End of likes`);
 	}
 }
 
@@ -595,7 +310,7 @@ const appendLikes = async (cursor) => {
 		let likeElem = pageElem.appendChild(html('div', { class: "like" }));
 
 		let likeLine1 = likeElem.appendChild(html('div', { class: 'like-line-1' }, [
-			html('div', { class: 'liked-at' }, `Liked on ${toUserDate(likeRecord.value.createdAt)}:`),
+			html('div', { class: 'liked-at' }, t(`Liked on`) + ` ${toUserDate(likeRecord.value.createdAt)}:`),
 		]));
 
 		if (settings.useCustom) {
@@ -607,23 +322,23 @@ const appendLikes = async (cursor) => {
 					likeElem.append(makePostView(post));
 				} else {
 					likeElem.append(html('div', { class: 'post' },
-						html('a', { href: toPostUri(likeRecord.value.subject.uri) }, `Post not found, it may have been deleted.`)));
+						html('a', { href: toPostUri(likeRecord.value.subject.uri) }, t(`Post not found, it may have been deleted.`))));
 				}
 			} else {
-				likeElem.append(html('div', { class: 'post' }, `Unsupported collection type ${likeRecord.value.subject.uri}`));
+				likeElem.append(html('div', { class: 'post' }, t(`Unsupported collection type`) + ` ${likeRecord.value.subject.uri}`));
 			}
 		}
 		if (settings.useEmbeds) {
 			let uri = parseUri(likeRecord.value.subject.uri);
 			let embed = likeElem.appendChild(makeEmbed(likeRecord.value.subject));
 
-			let reloadEmbedButton = html('button', { title: 'Reload embed' }, '🔄︎');
+			let reloadEmbedButton = html('button', { title: t(`Reload embed`) }, '🔄︎');
 			reloadEmbedButton.addEventListener('click', () => {
 				embed.replaceChildren(makeEmbed(likeRecord.value.subject));
 			});
 
 			likeLine1.append(
-				html('a', { href: toPostUri(likeRecord.value.subject.uri) }, 'Open on bsky.app'),
+				html('a', { href: toPostUri(likeRecord.value.subject.uri) }, t(`Open on bsky.app`)),
 				reloadEmbedButton,
 			);
 		}
@@ -648,7 +363,7 @@ const makePost = (post, record, embeds) => {
 			html('div', { class: 'column-main' }, [
 				html('div', { class: 'line-1' }, [
 					html('a', { href: toProfileUri(post.author.did) },
-						html('div', { class: 'display-name' }, post.author.displayName ?? "No display name")),
+						html('div', { class: 'display-name' }, post.author.displayName ?? t(`No display name`))),
 					html('a', { href: toProfileUri(post.author.handle) },
 						html('div', { class: 'handle' }, "@" + post.author.handle)),
 					html('div', { class: 'created-at' },
@@ -659,9 +374,9 @@ const makePost = (post, record, embeds) => {
 				...makePostEmbeds(embeds, post),
 
 				html('div', { class: 'line-counts' }, [
-					html('div', { title: `${post.replyCount} replies` }, `💬 ${post.replyCount}`),
-					html('div', { title: `${(post.repostCount + post.quoteCount)} reposts and quotes` }, `🔁 ${(post.repostCount + post.quoteCount)}`),
-					html('div', { title: `${post.likeCount} likes` }, `❤️ ${post.likeCount}`),
+					html('div', { title: `${post.replyCount} ` + t(`replies`) }, `💬 ${post.replyCount}`),
+					html('div', { title: `${(post.repostCount + post.quoteCount)} ` + t(`reposts and quotes`) }, `🔁 ${(post.repostCount + post.quoteCount)}`),
+					html('div', { title: `${post.likeCount} ` + t(`likes`) }, `❤️ ${post.likeCount}`),
 				]),
 			]),
 		]),
@@ -671,7 +386,7 @@ const makePost = (post, record, embeds) => {
 	if (hide) {
 		container1Elem.style.setProperty('display', 'none');
 
-		let buttonElem = html('button', { class: 'show-post' }, `Show post (${hide})`);
+		let buttonElem = html('button', { class: 'show-post' }, t(`Show post`) + ` (${hide})`);
 		buttonElem.addEventListener('click', () => {
 			container1Elem.style.removeProperty('display');
 			buttonElem.remove();
@@ -688,7 +403,7 @@ const makePost = (post, record, embeds) => {
 
 const makeReplyInfo = (post) => {
 	if (!post.reply) return;
-	return html('a', { href: toPostUri(post.reply.parent.uri) }, '⤷ Replying to post');
+	return html('a', { href: toPostUri(post.reply.parent.uri) }, '⤷ ' + t(`Replying to post`));
 }
 
 const makePostEmbeds = (postEmbeds, post) => {
@@ -714,7 +429,7 @@ const makePostEmbeds = (postEmbeds, post) => {
 
 			if (!Hls.isSupported()) {
 				return html('div', { class: 'embed-video' },
-					html('a', { href: toPostUri(post.uri), title: 'Video' }, thumbnailElem));
+					html('a', { href: toPostUri(post.uri), title: t(`Video`) }, thumbnailElem));
 			}
 
 			let embedVideoElem = html('div', { class: 'embed-video' }, thumbnailElem);
@@ -757,7 +472,7 @@ const makePostEmbeds = (postEmbeds, post) => {
 				makeEmbedRecordView(postEmbed.record.record),
 			];
 		} else {
-			return html('div', {}, `Unsupported embed type ${postEmbed.$type}`);
+			return html('div', {}, t(`Unsupported embed type`) + ` ${postEmbed.$type}`);
 		}
 	});
 }
@@ -767,19 +482,19 @@ const makeEmbedRecordView = (embedRecordView) => {
 		return makePost(embedRecordView, embedRecordView.value, embedRecordView.embeds);
 	} else if (embedRecordView.$type == 'app.bsky.embed.record#viewNotFound') {
 		return html('div', { class: 'post' },
-			html('a', { href: toPostUri(embedRecordView.uri) }, `Not found`));
+			html('a', { href: toPostUri(embedRecordView.uri) }, t(`Not found`)));
 	} else if (embedRecordView.$type == 'app.bsky.embed.record#viewBlocked') {
 		return html('div', { class: 'post' },
-			html('a', { href: toPostUri(embedRecordView.uri) }, `Blocked`));
+			html('a', { href: toPostUri(embedRecordView.uri) }, t(`Blocked`)));
 	} else if (embedRecordView.$type == 'app.bsky.embed.record#viewDetached') {
 		return html('div', { class: 'post' },
-			html('a', { href: toPostUri(embedRecordView.uri) }, `Detached`));
+			html('a', { href: toPostUri(embedRecordView.uri) }, t(`Detached`)));
 	// } else if (embedRecordView.$type == 'app.bsky.feed.defs#generatorView') {
 	// } else if (embedRecordView.$type == 'app.bsky.graph.defs#listView') {
 	// } else if (embedRecordView.$type == 'app.bsky.labeler.defs#labelerView') {
 	// } else if (embedRecordView.$type == 'app.bsky.graph.defs#starterPackViewBasic') {
 	} else {
-		return html('div', { class: 'post' }, `Unsupported record view type ${embedRecordView.$type}`);
+		return html('div', { class: 'post' }, t(`Unsupported record view type`) + ` ${embedRecordView.$type}`);
 	}
 }
 
@@ -820,7 +535,7 @@ const makeEmbed = (post) => {
 		html('blockquote', {
 			'data-bluesky-uri': post.uri,
 			'data-bluesky-cid': post.cid,
-		}, `Loading ${post.uri} embed...`),
+		}, t(`Loading ~1 embed...`, `${post.uri}`)),
 		html('script', {
 			src: "https://embed.bsky.app/static/embed.js",
 			charset: "utf-8",
@@ -850,13 +565,13 @@ const apiRequest = async (endpoint, args) => {
 	} catch (e) {
 		if (e instanceof TypeError) {
 			console.log(e);
-			throw new NotOkError(`Request failed`);
+			throw new NotOkError(t(`Request failed`));
 		}
 		throw e;
 	}
 }
 
-const toUserDate = (datetime) => datetime ? new Date(datetime).toLocaleString() : "Unknown time";
+const toUserDate = (datetime) => datetime ? new Date(datetime).toLocaleString() : t(`Unknown time`);
 
 const toRichText = (text, facets) => {
 	let elems = [];
@@ -881,7 +596,7 @@ const toRichText = (text, facets) => {
 			} else if (feature.$type == "app.bsky.richtext.facet#tag") {
 				elems.push(html('a', { href: toTagUri(feature.tag) }, current));
 			} else {
-				elems.push(html('span', { title: `Unsupported facet ${feature.$type}` }, current));
+				elems.push(html('span', { title: t(`Unsupported facet`) + ` ${feature.$type}` }, current));
 			}
 		}
 		lastByte = facet.index.byteEnd;
@@ -951,5 +666,3 @@ const abortWrapper = async (func) => {
 class NotOkError extends Error { }
 
 main();
-	</script>
-</body>

@@ -1,0 +1,239 @@
+body {
+	overflow-wrap: anywhere;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+label {
+	display: flex;
+	align-items: center;
+}
+
+.main {
+	font-family: sans-serif;
+	font-size: 10pt;
+	margin: 0 auto;
+	max-width: 600px;
+}
+
+.header {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
+.profile-form {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: end;
+	align-items: center;
+	column-gap: 8px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+.profile {
+	flex: 1;
+	flex-basis: 100%;
+	min-width: 0;
+}
+
+.about-dialog {
+	max-width: 600px;
+}
+
+.about-dialog>form {
+	display: flex;
+	justify-content: end;
+}
+
+.posts {
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+.like .like-line-1 {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+.like .like-line-1 *:first-child {
+	flex: 1;
+	flex-basis: auto;
+}
+
+.post {
+	border: 1px solid #808080;
+	padding: 8px;
+}
+
+.post .show-post {
+	width: 100%;
+}
+
+.post .container-1 {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.post .reply-info {}
+
+.post .container-avatar-main {
+	display: flex;
+	gap: 8px;
+}
+
+.post .container-avatar-main>.column-avatar {
+	width: 32px;
+}
+
+.post .container-avatar-main>.column-main {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.post .avatar {
+	width: 32px;
+	height: 32px;
+}
+
+.post .line-1 {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 8px;
+}
+
+.post .line-1 .display-name {
+	white-space-collapse: preserve;
+	font-weight: bold;
+}
+
+.post .text {
+	white-space-collapse: preserve;
+}
+
+.post .embed-images {
+	display: grid;
+	gap: 2px;
+	align-items: center;
+	justify-items: center;
+}
+
+.post .embed-images.size-1 {
+	grid-template-columns: 1fr;
+}
+
+.post .embed-images.size-2,
+.post .embed-images.size-3,
+.post .embed-images.size-4 {
+	grid-template-columns: 1fr 1fr;
+}
+
+.post .embed-images.size-2 .embed-thumbnail,
+.post .embed-images.size-3 .embed-thumbnail {
+	max-height: 300px;
+}
+
+.post .embed-images.size-3 a:not(:first-child) .embed-thumbnail {
+	max-height: 150px;
+}
+
+.post .embed-images.size-4 .embed-thumbnail {
+	max-height: 200px;
+}
+
+.post .embed-images.size-3 a:first-child {
+	grid-row: 1 / span 2;
+}
+
+.post .embed-video {
+	display: flex;
+	justify-content: center;
+	position: relative;
+}
+
+.post .embed-video video {
+	display: flex;
+	width: 100%;
+	max-height: 600px;
+}
+
+.post .embed-video .embed-video-thumbnail-wrapper {
+	width: fit-content;
+}
+
+.post .embed-video .embed-video-thumbnail-wrapper::after {
+	content: "▶︎";
+	font-size: 200%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 1.5em;
+	height: 1.5em;
+	opacity: 0.5;
+	background-color: black;
+	color: white;
+}
+
+.post .embed-video .embed-video-thumbnail-wrapper:hover {
+	outline: 1px solid #808080;
+}
+
+.post .embed-external {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid #808080;
+}
+
+.post .embed-external>.embed-external-text {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin: 8px;
+	white-space-collapse: preserve;
+}
+
+.post .embed-external>.embed-external-text>.title {
+	font-weight: bold;
+}
+
+.post .embed-thumbnail {
+	display: block;
+	max-height: 600px;
+	max-width: 100%;
+}
+
+.post .line-counts {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.post .line-counts div {
+	flex: 1;
+}
+
+.final {
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}

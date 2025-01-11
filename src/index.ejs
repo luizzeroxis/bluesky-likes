@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+
+<html lang="<%= lang.name %>">
+	<head>
+		<title><%= t(`See other profile's likes on Bluesky`) %></title>
+		<meta name="description" content=<%= t(`Wanna view the Bluesky likes of another user? This website will allow you to check that using the official Bluesky API.`) %> />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="light dark" />
+
+		<script class="lang-data" type="application/json"><%= JSON.stringify(lang.name == 'en' ? {name: lang.name} : {name: lang.name, strs: lang.strsJS}) %></script>
+
+		<script defer src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+		<script defer src="script.js"></script>
+
+		<link rel="stylesheet" href="style.css" />
+	</head>
+
+	<body>
+		<div class="main">
+			<div class="header">
+				<strong><%= t(`See other profile's likes on Bluesky`) %></strong>
+				<a class="about" href="javascript:;"><%= t(`About`) %></a>
+			</div>
+
+			<form class="profile-form">
+				<input class="profile" type="text" placeholder="https://bsky.app/profile/<%= t(`handle`) %>.bsky.social" enterkeyhint="go" />
+				<label><input class="infinite-scroll" type="checkbox" /><%= t(`Infinite scroll`) %></label>
+				<label><input class="reverse" type="checkbox" /><%= t(`Oldest first`) %></label>
+				<label class="show-hidden-label" style="display: none"><input class="show-hidden" type="checkbox" /><%= t(`Show adult/hidden`) %></label>
+				<select class="display-method" title="<%= t(`Method to use to display posts.`) %>">
+					<option value="embed" title="<%= t(`Use embeded iframes from Bluesky. Slow.`) %>"><%= t(`Embed`) %></option>
+					<option value="custom" title="<%= t(`Use my custom renderer. Faster, but may not accurately display some posts.`) %>"><%= t(`Custom`) %></option>
+				</select>
+				<div>
+					<input class="show-likes" type="submit" value="<%= t(`Show likes`) %>" />
+				</div>
+			</form>
+
+			<div class="posts">
+				<div class="pages"></div>
+				<div class="final"></div>
+			</div>
+
+			<dialog class="about-dialog">
+				<form method="dialog">
+					<input type="submit" value="❌︎" />
+				</form>
+
+				<h3><%= t(`See other profile's likes on Bluesky`) %></h3>
+
+				<p><%= t(`Wanna view the Bluesky likes of another user? This website will allow you to check that using the official Bluesky API.`) %></p>
+
+				<h4><%= t(`Usage:`) %></h4>
+
+				<p><%= t(`In the main text box, input the profile you want. It can be a handle, a bsky.app profile URL or a DID. "https://" isn't needed. Select "Oldest first" if you want to see likes in reverse order. Select "Show adult/hidden" if you want labeled content to be shown by default (only in the custom method). Use the dropdown to select the method to display posts. "Embed" loads iframes from Bluesky that contain the posts, which can be very slow. "Custom" may not show all posts correctly, but it is faster, can show more information and can play videos directly on the page. Finally, click "Show likes" to apply all settings and load them up.`) %></p>
+
+				<p><%= t(`You can use query parameters to link directly to some profile's likes with some options: <code>profile</code> is the profile, <code>method</code> can be set to <code>embed</code> or <code>custom</code>, <code>showhidden</code> and <code>reverse</code> can be <code>true</code>. Example: <code>https://luizzeroxis.github.io/bluesky-likes?profile=luizzeroxis.bsky.social&method=custom&showhidden=true&reverse=true</code>`) %></p>
+
+				<h4><%= t(`About:`) %></h4>
+
+				<p><%= t(`This website exists because for some reason the Bluesky official website doesn't show likes from other profiles, only your own, even though this is information that can be gathered using the API. There didn't seem to exist any website that used the API to show you that in a user interface, so I made it myself. I wonder what will happen to this website if they decide to add a likes tab on Bluesky?`) %></p>
+
+				<p><%= t(`Source code: <a href="https://github.com/luizzeroxis/bluesky-likes/">https://github.com/luizzeroxis/bluesky-likes/</a>. Licensed under the GNU General Public License Version 3. Uses <a href="https://github.com/video-dev/hls.js">hls.js</a>.`) %></p>
+
+				<p><%= t(`Visit my website for contact information: <a href="https://luizzeroxis.github.io/">https://luizzeroxis.github.io/</a>`) %></p>
+			</dialog>
+		</div>
+	</body>
+</html>
