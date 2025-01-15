@@ -637,7 +637,7 @@ const toPostUri = (uri) => {
 }
 
 const toTagUri = (tag) => {
-	return `https://bsky.app/tag/${tag}`;
+	return `https://bsky.app/hashtag/${tag}`;
 }
 
 const getLabelsDescription = (labels) => {
