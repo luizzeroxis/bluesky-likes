@@ -98,7 +98,7 @@ label {
 }
 
 .post .container-avatar-main>.column-avatar {
-	width: 32px;
+	width: 42px;
 }
 
 .post .container-avatar-main>.column-main {
@@ -109,8 +109,8 @@ label {
 }
 
 .post .avatar {
-	width: 32px;
-	height: 32px;
+	width: 42px;
+	height: 42px;
 }
 
 .post .line-1 {
