@@ -164,4 +164,8 @@ module.exports = {
 		}),
 	],
 	devtool: "inline-source-map",
+	devServer: {
+		hot: false,
+		liveReload: false,
+	},
 };
