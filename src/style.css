@@ -74,7 +74,10 @@ label {
 
 .post {
 	border: 1px solid #808080;
+	border-radius: 8px;
 	padding: 8px;
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica", "Arial", sans-serif;
+	font-size: 15px;
 }
 
 .post .show-post {
@@ -201,6 +204,11 @@ label {
 	display: flex;
 	flex-direction: column;
 	border: 1px solid #808080;
+	border-radius: 8px;
+}
+
+.post .embed-external:has(>a>.embed-thumbnail) {
+	border-radius: 0 0 8px 8px;
 }
 
 .post .embed-external>.embed-external-text {
@@ -213,6 +221,11 @@ label {
 
 .post .embed-external>.embed-external-text>.title {
 	font-weight: bold;
+}
+
+.post .embed-external>.embed-external-text>.url {
+	border-top: 1px solid #808080;
+	padding-top: 8px;
 }
 
 .post .embed-thumbnail {
@@ -228,6 +241,10 @@ label {
 
 .post .line-counts div {
 	flex: 1;
+}
+
+.post-embed iframe {
+	border-radius: .75rem;
 }
 
 .final {

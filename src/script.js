@@ -468,10 +468,13 @@ const makePostEmbeds = (postEmbeds, post) => {
 			return html('div', { class: 'embed-external' }, [
 				postEmbed.external.thumb ? html('a', { href: postEmbed.external.uri },
 					html('img', { class: 'embed-thumbnail', src: postEmbed.external.thumb })) : null,
+
 				html('div', { class: 'embed-external-text' }, [
 					postEmbed.external.title != "" ? html('a', { class: 'title', href: postEmbed.external.uri }, postEmbed.external.title) : null,
+
 					postEmbed.external.description != "" ? html('div', { class: 'description' }, postEmbed.external.description) : null,
-					html('a', { href: postEmbed.external.uri }, postEmbed.external.uri),
+
+					html('a', { class: 'url', href: postEmbed.external.uri }, postEmbed.external.uri),
 				]),
 			]);
 		} else if (postEmbed.$type == 'app.bsky.embed.record#view') {
@@ -543,7 +546,7 @@ const shouldHidePost = (post) => {
 }
 
 const makeEmbed = (post) => {
-	return html('div', {}, [
+	return html('div', {class: 'post-embed'}, [
 		html('blockquote', {
 			'data-bluesky-uri': post.uri,
 			'data-bluesky-cid': post.cid,
