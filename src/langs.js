@@ -109,6 +109,8 @@ module.exports = [
 				"Vídeo",
 			"Unsupported embed type":
 				"Tipo de 'embed' não suportado",
+			"Quoted post":
+				"Postagem citada",
 			"Not found":
 				"Não encontrado",
 			"Blocked":

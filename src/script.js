@@ -363,7 +363,7 @@ const makePostView = (postView) => {
 	return makePost(postView, postView.record, postView.embed);
 }
 
-const makePost = (post, record, embeds) => {
+const makePost = (post, record, embeds, depth=0) => {
 	let container1Elem = html('div', { class: 'container-1' }, [
 		makeReplyInfo(record),
 
@@ -383,7 +383,7 @@ const makePost = (post, record, embeds) => {
 				]),
 
 				record.text != "" ? html('div', { class: 'text' }, toRichText(record.text, record.facets ?? [])) : null,
-				...makePostEmbeds(embeds, post),
+				...makePostEmbeds(embeds, post, depth),
 
 				html('div', { class: 'line-counts' }, [
 					html('div', { title: `${post.replyCount} ` + t(`replies`) }, `💬 ${post.replyCount}`),
@@ -418,7 +418,7 @@ const makeReplyInfo = (post) => {
 	return html('a', { href: toPostUri(post.reply.parent.uri) }, '⤷ ' + t(`Replying to post`));
 }
 
-const makePostEmbeds = (postEmbeds, post) => {
+const makePostEmbeds = (postEmbeds, post, depth) => {
 	if (!postEmbeds) return [];
 	if (!Array.isArray(postEmbeds)) {
 		postEmbeds = [postEmbeds]
@@ -478,13 +478,13 @@ const makePostEmbeds = (postEmbeds, post) => {
 				]),
 			]);
 		} else if (postEmbed.$type == 'app.bsky.embed.record#view') {
-			return makeEmbedRecordView(postEmbed.record);
+			return makeEmbedRecordView(postEmbed.record, depth);
 		} else if (postEmbed.$type == 'app.bsky.embed.recordWithMedia#view') {
 			return [
-				...makePostEmbeds(postEmbed.media, post),
+				...makePostEmbeds(postEmbed.media, post, depth),
 				// postEmbed.record => app.bsky.embed.record
 				// postEmbed.record.record => app.bsky.embed.record#view (probably)
-				makeEmbedRecordView(postEmbed.record.record),
+				makeEmbedRecordView(postEmbed.record.record, depth),
 			];
 		} else {
 			return html('div', {}, t(`Unsupported embed type`) + ` ${postEmbed.$type}`);
@@ -492,9 +492,13 @@ const makePostEmbeds = (postEmbeds, post) => {
 	});
 }
 
-const makeEmbedRecordView = (embedRecordView) => {
+const makeEmbedRecordView = (embedRecordView, depth) => {
 	if (embedRecordView.$type == 'app.bsky.embed.record#viewRecord') {
-		return makePost(embedRecordView, embedRecordView.value, embedRecordView.embeds);
+		if (depth < 1) {
+			return makePost(embedRecordView, embedRecordView.value, embedRecordView.embeds, depth+1);
+		}
+		return html('div', { class: 'post' },
+			html('a', { href: toPostUri(embedRecordView.uri) }, t(`Quoted post`)));
 	} else if (embedRecordView.$type == 'app.bsky.embed.record#viewNotFound') {
 		return html('div', { class: 'post' },
 			html('a', { href: toPostUri(embedRecordView.uri) }, t(`Not found`)));
