@@ -211,6 +211,10 @@ label {
 	border-radius: 0 0 8px 8px;
 }
 
+.post .embed-external>a {
+	align-self: center;
+}
+
 .post .embed-external>.embed-external-text {
 	display: flex;
 	flex-direction: column;

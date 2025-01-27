@@ -470,7 +470,7 @@ const makePostEmbeds = (postEmbeds, post) => {
 					html('img', { class: 'embed-thumbnail', src: postEmbed.external.thumb })) : null,
 
 				html('div', { class: 'embed-external-text' }, [
-					postEmbed.external.title != "" ? html('a', { class: 'title', href: postEmbed.external.uri }, postEmbed.external.title) : null,
+					html('a', { class: 'title', href: postEmbed.external.uri }, postEmbed.external.title || postEmbed.external.uri),
 
 					postEmbed.external.description != "" ? html('div', { class: 'description' }, postEmbed.external.description) : null,
 
