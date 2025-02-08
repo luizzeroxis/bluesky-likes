@@ -375,7 +375,7 @@ const makePost = (post, record, embeds, depth=0) => {
 			html('div', { class: 'column-main' }, [
 				html('div', { class: 'line-1' }, [
 					html('a', { href: toProfileUri(post.author.did) },
-						html('div', { class: 'display-name' }, post.author.displayName ?? t(`No display name`))),
+						html('div', { class: 'display-name' }, post.author.displayName || post.author.handle)),
 					html('a', { href: toProfileUri(post.author.handle) },
 						html('div', { class: 'handle' }, "@" + post.author.handle)),
 					html('div', { class: 'created-at' },

@@ -93,8 +93,6 @@ module.exports = [
 				"Recarregar incorporação",
 			"Open on bsky.app":
 				"Abrir em bsky.app",
-			"No display name":
-				"Sem nome de exibição",
 			"replies":
 				"respostas",
 			"reposts and quotes":
