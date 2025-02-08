@@ -127,6 +127,8 @@ module.exports = [
 				"Tempo desconhecido",
 			"Unsupported facet":
 				"'facet' não suportado",
+			"Profile: ":
+				"Perfil: ",
 		},
 	},
 ];

@@ -385,6 +385,8 @@ const makePost = (post, record, embeds, depth=0) => {
 				record.text != "" ? html('div', { class: 'text' }, toRichText(record.text, record.facets ?? [])) : null,
 				...makePostEmbeds(embeds, post, depth),
 
+				...makeLabels(post),
+
 				html('div', { class: 'line-counts' }, [
 					html('div', { title: `${post.replyCount} ` + t(`replies`) }, `💬 ${post.replyCount}`),
 					html('div', { title: `${(post.repostCount + post.quoteCount)} ` + t(`reposts and quotes`) }, `🔁 ${(post.repostCount + post.quoteCount)}`),
@@ -394,11 +396,15 @@ const makePost = (post, record, embeds, depth=0) => {
 		]),
 	]);
 
-	let hide = shouldHidePost(post);
-	if (hide) {
+	let labels = getPostLabels(post);
+	let labelsToHide = getToHideLabels(labels);
+
+	if (labelsToHide.length > 0) {
 		container1Elem.style.setProperty('display', 'none');
 
-		let buttonElem = html('button', { class: 'show-post' }, t(`Show post`) + ` (${getLabelsDescription(hide)})`);
+		let buttonElem = html('button', { class: 'show-post' }, t(`Show post`)
+			+ ` (${labelsToHide.map(x => getLabelDescription(x)).join(', ')})`);
+
 		buttonElem.addEventListener('click', () => {
 			container1Elem.style.removeProperty('display');
 			buttonElem.remove();
@@ -517,36 +523,43 @@ const makeEmbedRecordView = (embedRecordView, depth) => {
 	}
 }
 
-const shouldHidePost = (post) => {
-	if (settings.showHidden) return false;
-	if (!post.labels) return false;
-
-	const getHideLabelValues = (labels) => {
+const getPostLabels = (post) => {
+	const parseLabels = (labels) => {
 		let values = [];
 		for (let label of labels) {
-			if (Object.keys(knownLabels).includes(label.val)) {
-				if (!label.neg) {
-					values.push(label.val);
-				} else {
-					values = values.filter(x => x != label.val);
-				}
+			if (!label.neg) {
+				values.push(label.val);
 			} else {
-				console.log(post, label);
+				values = values.filter(x => x != label.val);
 			}
 		}
 		return values;
 	}
 
-	let values = [
-		...(post.author.labels ? getHideLabelValues(post.author.labels) : []),
-		...(post.labels ? getHideLabelValues(post.labels) : []),
-	];
+	return [
+		...(post.author.labels ? parseLabels(post.author.labels).map(label => ({ onProfile: true, name: label })) : []),
+		...(post.labels ? parseLabels(post.labels).map(label => ({ onProfile: false, name: label })) : []),
+	]
+}
 
-	if (values.length > 0) {
-		return values;
+const makeLabels = (post) => {
+	let labels = getPostLabels(post);
+
+	if (labels.length > 0) {
+		return [
+			html('div', { class: 'line-labels' }, [
+				...labels.map(label =>
+					html('div', { class: 'label' }, getLabelDescription(label))
+				),
+			])
+		];
+	} else {
+		return [];
 	}
+}
 
-	return false;
+const getToHideLabels = (labels) => {
+	return labels.filter(label => Object.keys(knownLabels).includes(label.name));
 }
 
 const makeEmbed = (post) => {
@@ -647,8 +660,8 @@ const toTagUri = (tag) => {
 	return `https://bsky.app/hashtag/${tag}`;
 }
 
-const getLabelsDescription = (labels) => {
-	return labels.map(label => knownLabels[label]).join(", ");
+const getLabelDescription = (label) => {
+	return (label.onProfile ? t(`Profile: `) : '') + (knownLabels[label.name] ?? label.name);
 }
 
 // Helpers
