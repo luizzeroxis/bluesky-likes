@@ -399,7 +399,7 @@ const makePost = (post, record, embeds, depth=0) => {
 	let labels = getPostLabels(post);
 	let labelsToHide = getToHideLabels(labels);
 
-	if (labelsToHide.length > 0) {
+	if (labelsToHide.length > 0 && !settings.showHidden) {
 		container1Elem.style.setProperty('display', 'none');
 
 		let buttonElem = html('button', { class: 'show-post' }, t(`Show post`)
