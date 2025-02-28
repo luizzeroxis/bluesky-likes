@@ -439,11 +439,11 @@ const makePostEmbeds = (postEmbeds, post, depth) => {
 				'size-4';
 
 			return html('div', { class: 'embed-images ' + sizeClassName }, postEmbed.images.map(image =>
-				html('a', { href: image.fullsize }, html('img', { class: 'embed-thumbnail', src: image.thumb, alt: image.alt, title: image.alt }))
+				html('a', { href: image.fullsize }, makeEmbedThumbnail(image.thumb, image.aspectRatio, image.alt))
 			));
 		} else if (postEmbed.$type == 'app.bsky.embed.video#view') {
 			let thumbnailElem = html('div', { class: 'embed-video-thumbnail-wrapper' },
-				html('img', { class: 'embed-thumbnail', src: postEmbed.thumbnail }));
+				makeEmbedThumbnail(postEmbed.thumbnail, postEmbed.aspectRatio));
 
 			if (!Hls.isSupported()) {
 				return html('div', { class: 'embed-video' },
@@ -473,7 +473,7 @@ const makePostEmbeds = (postEmbeds, post, depth) => {
 		} else if (postEmbed.$type == 'app.bsky.embed.external#view') {
 			return html('div', { class: 'embed-external' }, [
 				postEmbed.external.thumb ? html('a', { href: postEmbed.external.uri },
-					html('img', { class: 'embed-thumbnail', src: postEmbed.external.thumb })) : null,
+					makeEmbedThumbnail(postEmbed.external.thumb)) : null,
 
 				html('div', { class: 'embed-external-text' }, [
 					html('a', { class: 'title', href: postEmbed.external.uri }, postEmbed.external.title || postEmbed.external.uri),
@@ -496,6 +496,20 @@ const makePostEmbeds = (postEmbeds, post, depth) => {
 			return html('div', {}, t(`Unsupported embed type`) + ` ${postEmbed.$type}`);
 		}
 	});
+}
+
+const makeEmbedThumbnail = (src, aspectRatio, alt) => {
+	let imgElem = html('img', { class: 'embed-thumbnail', src: src });
+	if (alt) {
+		imgElem.alt = alt;
+		imgElem.title = alt;
+	}
+
+	if (aspectRatio) {
+		imgElem.style.width = `${aspectRatio.width}px`; // Don't ask
+		imgElem.style.aspectRatio = `${aspectRatio.width} / ${aspectRatio.height}`;
+	}
+	return imgElem;
 }
 
 const makeEmbedRecordView = (embedRecordView, depth) => {

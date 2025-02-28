@@ -215,6 +215,11 @@ label {
 	align-self: center;
 }
 
+.post .embed-external>a>.embed-thumbnail {
+	width: 1200px;
+	aspect-ratio: 1200 / 630;
+}
+
 .post .embed-external>.embed-external-text {
 	display: flex;
 	flex-direction: column;
@@ -236,6 +241,7 @@ label {
 	display: block;
 	max-height: 600px;
 	max-width: 100%;
+	object-fit: contain;
 }
 
 .post .line-labels .label {
