@@ -104,6 +104,8 @@ const main = () => {
 	if (profile != null) {
 		load();
 	}
+
+	$('.main').style.removeProperty('display');
 }
 
 const t = (str, arg) => {
@@ -453,6 +455,7 @@ const makePostEmbeds = (postEmbeds, post, depth) => {
 			let embedVideoElem = html('div', { class: 'embed-video' }, thumbnailElem);
 
 			thumbnailElem.addEventListener('click', () => {
+				if (!Hls) return;
 				let hls = new Hls();
 				hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
 					console.log(hls.currentLevel, data.levels);

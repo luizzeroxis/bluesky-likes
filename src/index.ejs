@@ -11,22 +11,23 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="color-scheme" content="light dark" />
 
-		<script class="lang-data" type="application/json"><%= JSON.stringify(lang.name == 'en' ? {name: lang.name} : {name: lang.name, strs: lang.strsJS}) %></script>
-
-		<script defer src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
-		<script defer src="script.js"></script>
 
 		<link rel="stylesheet" href="style.css" />
+
+		<script defer src="script.js"></script>
+		<script class="hls" defer src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+
+		<script class="lang-data" type="application/json"><%= JSON.stringify(lang.name == 'en' ? {name: lang.name} : {name: lang.name, strs: lang.strsJS}) %></script>
 	</head>
 
 	<body>
-		<div class="main">
+		<div class="main" style="display: none;">
 			<div class="header">
 				<strong><%= t(`See other profile's likes on Bluesky`) %></strong>
 				<a class="about" href="javascript:;"><%= t(`About`) %></a>
 			</div>
 
-			<form class="profile-form">
+			<form class="profile-form" action="javascript:;">
 				<input class="profile" type="text" placeholder="https://bsky.app/profile/<%= t(`handle`) %>.bsky.social" enterkeyhint="go" />
 				<label><input class="infinite-scroll" type="checkbox" /><%= t(`Infinite scroll`) %></label>
 				<label><input class="reverse" type="checkbox" /><%= t(`Oldest first`) %></label>
