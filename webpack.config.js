@@ -30,6 +30,7 @@ module.exports = {
 		),
 		new CopyPlugin({
 			patterns: [
+				'./src/favicon.png',
 				'./src/style.css',
 			],
 		}),
