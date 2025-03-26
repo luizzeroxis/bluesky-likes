@@ -584,6 +584,7 @@ const makeEmbed = (post) => {
 		html('blockquote', {
 			'data-bluesky-uri': post.uri,
 			'data-bluesky-cid': post.cid,
+			'data-bluesky-embed-color-mode': 'system',
 		}, t(`Loading ~1 embed...`, `${post.uri}`)),
 		html('script', {
 			src: "https://embed.bsky.app/static/embed.js",

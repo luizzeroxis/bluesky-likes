@@ -261,10 +261,6 @@ label {
 	flex: 1;
 }
 
-.post-embed iframe {
-	border-radius: .75rem;
-}
-
 .final {
 	display: flex;
 	flex-direction: column;
