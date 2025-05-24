@@ -13,9 +13,9 @@ let currentLoadMoreLikesElem = null;
 let settings = {
 	reverse: false,
 	showHidden: false,
-	useEmbeds: true,
-	useCustom: false,
-	infiniteScroll: false,
+	useEmbeds: false,
+	useCustom: true,
+	infiniteScroll: true,
 };
 
 // Main
