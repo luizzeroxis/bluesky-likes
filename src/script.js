@@ -32,7 +32,7 @@ const main = () => {
 		'graphic-media': t(`graphic media`),
 		'nudity': t(`non-sexual nudity`),
 		'sexual-figurative': t(`sexually suggestive (cartoon)`),
-	}
+	};
 
 	window.addEventListener('resize', e => {
 		appendLikesWithMoreInfiniteScroll();
@@ -48,15 +48,15 @@ const main = () => {
 
 	$('.infinite-scroll').addEventListener('input', () => {
 		updateSettings();
-	})
+	});
 
 	$('.reverse').addEventListener('input', () => {
 		updateSettings();
-	})
+	});
 
 	$('.show-hidden').addEventListener('input', () => {
 		updateSettings();
-	})
+	});
 
 	$('.display-method').addEventListener('change', () => {
 		updateSettings();
@@ -83,7 +83,7 @@ const main = () => {
 			return param == trueValue ? true
 				: param == falseValue ? false
 				: previousValue;
-		}
+		};
 
 		settings.infiniteScroll = setSearchBool('infinitescroll', settings.infiniteScroll);
 		settings.reverse = setSearchBool('reverse', settings.reverse);
@@ -106,7 +106,7 @@ const main = () => {
 	}
 
 	$('.main').style.removeProperty('display');
-}
+};
 
 const t = (str, arg) => {
 	let trans = str;
@@ -121,17 +121,17 @@ const t = (str, arg) => {
 	}
 
 	return trans.replaceAll('~1', arg);
-}
+};
 
 const loadSettings = () => {
 	let settingsStored = localStorage.getItem("settings");
 	if (settingsStored) {
 		settingsStored = JSON.parse(settingsStored);
 		for (let key of Object.keys(settingsStored)) {
-			settings[key] = settingsStored[key] ?? setings[key];
+			settings[key] = settingsStored[key] ?? settings[key];
 		}
 	}
-}
+};
 
 const updateSettings = () => {
 	settings.infiniteScroll = $('.infinite-scroll').checked;
@@ -150,7 +150,7 @@ const updateSettings = () => {
 	updateDisplayMethodSelect();
 
 	saveSettings();
-}
+};
 
 const applySettings = () => {
 	$('.infinite-scroll').checked = settings.infiniteScroll;
@@ -159,12 +159,12 @@ const applySettings = () => {
 	$('.display-method').value = settings.useEmbeds ? 'embed' : settings.useCustom ? 'custom' : null;
 
 	updateDisplayMethodSelect();
-}
+};
 
 const saveSettings = () => {
 	// Save settings
 	localStorage.setItem("settings", JSON.stringify(settings));
-}
+};
 
 const updateDisplayMethodSelect = () => {
 	// Show hidden does nothing on embed method
@@ -173,7 +173,7 @@ const updateDisplayMethodSelect = () => {
 	} else {
 		$('.show-hidden-label').style.removeProperty('display');
 	}
-}
+};
 
 const parseProfile = (input) => {
 	if (input.startsWith('http://') || input.startsWith('https://')) {
@@ -186,7 +186,7 @@ const parseProfile = (input) => {
 
 	console.log(input);
 	return input;
-}
+};
 
 // Load
 
@@ -238,7 +238,7 @@ const load = async () => {
 			}
 		}
 	});
-}
+};
 
 const appendLikesWithMore = async () => {
 	await abortWrapper(async () => {
@@ -259,7 +259,7 @@ const appendLikesWithMore = async () => {
 			}
 		}
 	});
-}
+};
 
 const appendLikesWithMoreInternal = async () => {
 	$('.final').textContent = t(`Loading...`);
@@ -275,7 +275,7 @@ const appendLikesWithMoreInternal = async () => {
 	} else {
 		$('.final').textContent = t(`End of likes`);
 	}
-}
+};
 
 const appendLikesWithMoreInfiniteScroll = () => {
 	if (!settings.infiniteScroll || currentCursor == null || abortController != null) return;
@@ -284,7 +284,7 @@ const appendLikesWithMoreInfiniteScroll = () => {
 		console.log('Infinite scroll load');
 		appendLikesWithMore();
 	}
-}
+};
 
 const appendLikes = async (cursor) => {
 	// com.atproto.repo.listRecords
@@ -353,17 +353,17 @@ const appendLikes = async (cursor) => {
 
 			likeLine1.append(
 				html('a', { href: toPostUri(likeRecord.value.subject.uri) }, t(`Open on bsky.app`)),
-				reloadEmbedButton,
+				reloadEmbedButton
 			);
 		}
 	}
 
 	return likes.cursor;
-}
+};
 
 const makePostView = (postView) => {
 	return makePost(postView, postView.record, postView.embed);
-}
+};
 
 const makePost = (post, record, embeds, depth=0) => {
 	let container1Elem = html('div', { class: 'container-1' }, [
@@ -419,17 +419,17 @@ const makePost = (post, record, embeds, depth=0) => {
 	} else {
 		return html('div', { class: 'post' }, container1Elem);
 	}
-}
+};
 
 const makeReplyInfo = (post) => {
 	if (!post.reply) return;
 	return html('a', { href: toPostUri(post.reply.parent.uri) }, '⤷ ' + t(`Replying to post`));
-}
+};
 
 const makePostEmbeds = (postEmbeds, post, depth) => {
 	if (!postEmbeds) return [];
 	if (!Array.isArray(postEmbeds)) {
-		postEmbeds = [postEmbeds]
+		postEmbeds = [postEmbeds];
 	}
 
 	return postEmbeds.flatMap(postEmbed => {
@@ -499,7 +499,7 @@ const makePostEmbeds = (postEmbeds, post, depth) => {
 			return html('div', {}, t(`Unsupported embed type`) + ` ${postEmbed.$type}`);
 		}
 	});
-}
+};
 
 const makeEmbedThumbnail = (src, aspectRatio, alt) => {
 	let imgElem = html('img', { class: 'embed-thumbnail', src: src });
@@ -513,7 +513,7 @@ const makeEmbedThumbnail = (src, aspectRatio, alt) => {
 		imgElem.style.aspectRatio = `${aspectRatio.width} / ${aspectRatio.height}`;
 	}
 	return imgElem;
-}
+};
 
 const makeEmbedRecordView = (embedRecordView, depth) => {
 	if (embedRecordView.$type == 'app.bsky.embed.record#viewRecord') {
@@ -538,7 +538,7 @@ const makeEmbedRecordView = (embedRecordView, depth) => {
 	} else {
 		return html('div', { class: 'post' }, t(`Unsupported record view type`) + ` ${embedRecordView.$type}`);
 	}
-}
+};
 
 const getPostLabels = (post) => {
 	const parseLabels = (labels) => {
@@ -551,13 +551,13 @@ const getPostLabels = (post) => {
 			}
 		}
 		return values;
-	}
+	};
 
 	return [
 		...(post.author.labels ? parseLabels(post.author.labels).map(label => ({ onProfile: true, name: label })) : []),
 		...(post.labels ? parseLabels(post.labels).map(label => ({ onProfile: false, name: label })) : []),
-	]
-}
+	];
+};
 
 const makeLabels = (post) => {
 	let labels = getPostLabels(post);
@@ -573,11 +573,11 @@ const makeLabels = (post) => {
 	} else {
 		return [];
 	}
-}
+};
 
 const getToHideLabels = (labels) => {
 	return labels.filter(label => Object.keys(knownLabels).includes(label.name));
-}
+};
 
 const makeEmbed = (post) => {
 	return html('div', {class: 'post-embed'}, [
@@ -592,7 +592,7 @@ const makeEmbed = (post) => {
 			async: "async",
 		})
 	]);
-}
+};
 
 // Bluesky utils
 
@@ -619,7 +619,7 @@ const apiRequest = async (endpoint, args) => {
 		}
 		throw e;
 	}
-}
+};
 
 const toUserDate = (datetime) => datetime ? new Date(datetime).toLocaleString() : t(`Unknown time`);
 
@@ -654,7 +654,7 @@ const toRichText = (text, facets) => {
 
 	elems.push(slice(lastByte, array.length));
 	return elems;
-}
+};
 
 const parseUri = (uri) => {
 	return {
@@ -662,25 +662,25 @@ const parseUri = (uri) => {
 		collection: uri.split("/")[3],
 		rkey: uri.split("/")[4],
 	};
-}
+};
 
 const toProfileUri = (did) => {
 	return `https://bsky.app/profile/${did}`;
-}
+};
 
 const toPostUri = (uri) => {
 	let at = parseUri(uri);
 	let collection = (at.collection == "app.bsky.feed.post") ? "post" : "";
 	return `https://bsky.app/profile/${at.repo}/post/${at.rkey}`;
-}
+};
 
 const toTagUri = (tag) => {
 	return `https://bsky.app/hashtag/${tag}`;
-}
+};
 
 const getLabelDescription = (label) => {
 	return (label.onProfile ? t(`Profile: `) : '') + (knownLabels[label.name] ?? label.name);
-}
+};
 
 // Helpers
 
@@ -699,7 +699,7 @@ const html = (tag, attrs, contents) => {
 		e.append(...contents.filter(x => x));
 	}
 	return e;
-}
+};
 
 const abortWrapper = async (func) => {
 	abortController?.abort();
@@ -715,7 +715,7 @@ const abortWrapper = async (func) => {
 			throw e;
 		}
 	}
-}
+};
 
 class NotOkError extends Error { }
 
