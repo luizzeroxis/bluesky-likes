@@ -182,6 +182,9 @@ const parseProfile = (input) => {
 	if (input.startsWith('bsky.app/profile/')) {
 		input = input.slice('bsky.app/profile/'.length);
 	}
+	if (input.startsWith('@')) {
+		input = input.slice('@'.length);
+	}
 	if (input == "") return null;
 
 	console.log(input);
