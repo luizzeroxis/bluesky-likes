@@ -379,8 +379,13 @@ const makePost = (post, record, embeds, depth=0) => {
 
 			html('div', { class: 'column-main' }, [
 				html('div', { class: 'line-1' }, [
-					html('a', { href: toProfileUri(post.author.did) },
-						html('div', { class: 'display-name' }, post.author.displayName || post.author.handle)),
+					html('a', { href: toProfileUri(post.author.did) },[
+						html('span', { class: 'display-name' }, [
+							post.author.displayName || post.author.handle,
+						]),
+						(post.author.verification && post.author.verification.verifiedStatus == 'valid')
+							? html('img', { class: 'verification', src: 'verified.svg', alt: t(`Verified`), title: t(`Verified`) }) : null
+					]),
 					html('a', { href: toProfileUri(post.author.handle) },
 						html('div', { class: 'handle' }, "@" + post.author.handle)),
 					html('div', { class: 'created-at' },

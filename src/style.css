@@ -125,6 +125,11 @@ label {
 	font-weight: bold;
 }
 
+.post .line-1 .verification {
+	margin-left: 4px;
+	vertical-align: bottom;
+}
+
 .post .text {
 	white-space-collapse: preserve;
 }

@@ -32,6 +32,7 @@ module.exports = {
 			patterns: [
 				'./src/favicon.png',
 				'./src/style.css',
+				'./src/verified.svg',
 			],
 		}),
 	],

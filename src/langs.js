@@ -93,6 +93,8 @@ module.exports = [
 				"Recarregar incorporação",
 			"Open on bsky.app":
 				"Abrir em bsky.app",
+			"Verified":
+				"Verificado",
 			"replies":
 				"respostas",
 			"reposts and quotes":
