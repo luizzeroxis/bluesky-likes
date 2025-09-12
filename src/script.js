@@ -42,6 +42,10 @@ const main = () => {
 		appendLikesWithMoreInfiniteScroll();
 	});
 
+	$('.header .message-interact').addEventListener('click', () => {
+		$('.header .message').textContent = t(`Trans rights are human rights!`);
+	});
+
 	$('.about').addEventListener('click', () => {
 		$('.about-dialog').showModal();
 	});

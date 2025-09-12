@@ -1,5 +1,6 @@
 body {
 	overflow-wrap: anywhere;
+	margin: 0;
 }
 
 a {
@@ -19,13 +20,21 @@ label {
 	font-family: sans-serif;
 	font-size: 10pt;
 	margin: 0 auto;
+	padding: 8px;
 	max-width: 600px;
+	min-height: 100vh;
+	box-sizing: border-box;
 }
 
 .header {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
+	align-items: baseline;
+}
+
+.header .message-interact {
+	cursor: pointer;
 }
 
 .profile-form {

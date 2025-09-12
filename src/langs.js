@@ -71,6 +71,8 @@ module.exports = [
 				"nudez não-erótica",
 			"sexually suggestive (cartoon)":
 				"sexualmente sugestivo (desenho)",
+			"Trans rights are human rights!":
+				"Direitos trans são direitos humanos!",
 			"Request cancelled":
 				"Requisição cancelada",
 			"Loading...":
