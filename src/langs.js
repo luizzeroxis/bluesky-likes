@@ -103,6 +103,8 @@ module.exports = [
 				"repostagens e citações",
 			"likes":
 				"curtidas",
+			"saves":
+				"salvos",
 			"Show post":
 				"Mostrar postagem",
 			"Replying to post":
