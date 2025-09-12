@@ -405,7 +405,7 @@ const makePost = (post, record, embeds, depth=0) => {
 					html('div', { title: `${post.replyCount} ` + t(`replies`) }, `💬 ${post.replyCount}`),
 					html('div', { title: `${(post.repostCount + post.quoteCount)} ` + t(`reposts and quotes`) }, `🔁 ${(post.repostCount + post.quoteCount)}`),
 					html('div', { title: `${post.likeCount} ` + t(`likes`) }, `❤️ ${post.likeCount}`),
-					html('div', { title: `${post.bookmarkCount} ` + t(`saves`) }, `🔖 ${post.bookmarkCount}`),
+					post.bookmarkCount != null ? html('div', { title: `${post.bookmarkCount} ` + t(`saves`) }, `🔖 ${post.bookmarkCount}`) : null,
 				]),
 			]),
 		]),
