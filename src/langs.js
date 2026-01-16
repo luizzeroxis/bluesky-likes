@@ -75,6 +75,12 @@ module.exports = [
 				"sexualmente sugestivo (desenho)",
 			"Trans rights are human rights!":
 				"Direitos trans são direitos humanos!",
+			"Copy link":
+				"Copiar link",
+			"Copied":
+				"Copiado",
+			"Copying failed":
+				"Copiar falhou",
 			"Request cancelled":
 				"Requisição cancelada",
 			"Loading...":
@@ -203,6 +209,12 @@ module.exports = [
 				"sexualmente sugestivo (dibujos o similar)",
 			"Trans rights are human rights!":
 				"Derechos trans son derechos humanos!",
+			"Copy link":
+				"Copiar enlace",
+			"Copied":
+				"Copiado",
+			"Copying failed":
+				"Error al copiar",
 			"Request cancelled":
 				"Solicitud cancelada",
 			"Loading...":

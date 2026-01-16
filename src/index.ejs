@@ -25,8 +25,13 @@
 	<body>
 		<div class="main" style="display: none;">
 			<div class="header">
-				<strong><span class="message"><%= t(`See other profile's likes on Bluesky`) %></span> <span class="message-interact" tabindex="0">🏳️‍⚧️</span></strong>
-				<a class="about" href="javascript:;"><%= t(`About`) %></a>
+				<div class="title">
+					<span class="message"><%= t(`See other profile's likes on Bluesky`) %></span> <span class="message-interact" tabindex="0">🏳️‍⚧️</span>
+				</div>
+				<div class="buttons">
+					<a class="copy-link" href="javascript:;" style="display: none;"><%= t(`Copy link`) %></a>
+					<a class="about" href="javascript:;"><%= t(`About`) %></a>
+				</div>
 			</div>
 
 			<form class="profile-form" action="javascript:;">

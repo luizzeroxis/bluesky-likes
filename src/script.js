@@ -46,6 +46,11 @@ const main = () => {
 		$('.header .message').textContent = t(`Trans rights are human rights!`);
 	});
 
+	$('.copy-link').addEventListener('click', e => {
+		e.preventDefault();
+		copyLink();
+	});
+
 	$('.about').addEventListener('click', () => {
 		$('.about-dialog').showModal();
 	});
@@ -195,6 +200,21 @@ const parseProfile = (input) => {
 	return input;
 };
 
+const getLink = () => {
+	let url = new URL(window.location.origin + window.location.pathname);
+	url.searchParams.set("profile", profile);
+	return url.toString();
+}
+
+const copyLink = async () => {
+	try {
+		await navigator.clipboard.writeText(getLink());
+		$('.copy-link').textContent = t(`Copied`);
+	} catch (e) {
+		$('.copy-link').textContent = t(`Copying failed`);
+	}
+};
+
 // Load
 
 const load = async () => {
@@ -207,6 +227,8 @@ const load = async () => {
 		currentLoadMoreLikesElem = null;
 
 		$('.pages').replaceChildren();
+
+		$('.copy-link').style.setProperty('display', 'none');
 
 		try {
 			$('.final').textContent = t(`Loading...`);
@@ -237,6 +259,10 @@ const load = async () => {
 			console.log(endpoint);
 
 			await appendLikesWithMoreInternal();
+
+			$('.copy-link').style.removeProperty('display');
+			$('.copy-link').textContent = t(`Copy link`);
+			$('.copy-link').href = getLink();
 		} catch (e) {
 			if (e instanceof NotOkError) {
 				$('.final').textContent = t(`Error when fetching likes:`) + ` ${e.message}`;

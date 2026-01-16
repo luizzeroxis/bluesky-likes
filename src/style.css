@@ -29,8 +29,21 @@ label {
 .header {
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: space-between;
 	align-items: baseline;
+	column-gap: 8px;
+	row-gap: 4px;
+}
+
+.header .title {
+	flex-grow: 1;
+	font-weight: bold;
+}
+
+.header .buttons {
+	flex-grow: 1;
+	display: flex;
+	justify-content: end;
+	gap: 8px;
 }
 
 .header .message-interact {
