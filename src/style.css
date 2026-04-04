@@ -29,6 +29,7 @@ label {
 }
 
 .main {
+	width: calc(100% - 16px);
 	max-width: 600px;
 	box-sizing: border-box;
 	flex: 1;
@@ -75,7 +76,7 @@ label {
 }
 
 .profile {
-	min-width: 0;
+	width: 0;
 	flex: 1;
 	flex-basis: 100%;
 }
