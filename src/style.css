@@ -143,6 +143,7 @@ label {
 	flex: 1;
 	flex-direction: column;
 	gap: 8px;
+	min-width: 0;
 }
 
 .post .avatar {
@@ -277,6 +278,19 @@ label {
 .post .embed-external>.embed-external-text>.url {
 	padding-top: 8px;
 	border-top: 1px solid #808080;
+}
+
+.post .embed-gallery {
+	display: flex;
+	overflow: auto;
+	align-items: center;
+	gap: 2px;
+	min-height: 24px;
+}
+
+.post .embed-gallery .embed-thumbnail {
+	max-width: 300px;
+	max-height: 300px;
 }
 
 .post .embed-thumbnail {

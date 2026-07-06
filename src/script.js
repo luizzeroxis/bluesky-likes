@@ -534,13 +534,22 @@ const makePostEmbeds = (postEmbeds, post, depth) => {
 				// postEmbed.record.record => app.bsky.embed.record#view (probably)
 				makeEmbedRecordView(postEmbed.record.record, depth),
 			];
+		} else if (postEmbed.$type == 'app.bsky.embed.gallery#view') {
+			return html('div', { class: 'embed-gallery' },
+				postEmbed.items?.map(item => {
+					if (item.$type == 'app.bsky.embed.gallery#viewImage'){
+						return html('a', { href: item.fullsize }, makeEmbedThumbnail(item.thumbnail, item.aspectRatio, item.alt, false));
+					} else {
+						return html('div', {}, t(`Unsupported embed type`) + ` ${item.$type}`);
+					}
+				}));
 		} else {
 			return html('div', {}, t(`Unsupported embed type`) + ` ${postEmbed.$type}`);
 		}
 	});
 };
 
-const makeEmbedThumbnail = (src, aspectRatio, alt) => {
+const makeEmbedThumbnail = (src, aspectRatio, alt, setWidth=true) => {
 	let imgElem = html('img', { class: 'embed-thumbnail', src: src });
 	if (alt) {
 		imgElem.alt = alt;
@@ -548,7 +557,9 @@ const makeEmbedThumbnail = (src, aspectRatio, alt) => {
 	}
 
 	if (aspectRatio) {
-		imgElem.style.width = `${aspectRatio.width}px`; // Don't ask
+		if (setWidth) {
+			imgElem.style.width = `${aspectRatio.width}px`; // Don't ask
+		}
 		imgElem.style.aspectRatio = `${aspectRatio.width} / ${aspectRatio.height}`;
 	}
 	return imgElem;
