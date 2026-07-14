@@ -509,7 +509,7 @@ const makePostEmbeds = (postEmbeds, post, depth) => {
 					controls: true,
 					autoplay: true,
 					poster: postEmbed.thumbnail,
-					loop: (postEmbed.presentation == 'gif')
+					loop: (postEmbed.presentation == 'gif') ? 'loop' : null
 				});
 				embedVideoElem.replaceChildren(videoElem);
 
@@ -745,7 +745,9 @@ const html = (tag, attrs, contents) => {
 	const e = document.createElement(tag);
 	if (attrs) {
 		for (let [attrName, attrValue] of Object.entries(attrs)) {
-			e.setAttribute(attrName, attrValue);
+			if (attrValue != null) {
+				e.setAttribute(attrName, attrValue);
+			}
 		}
 	}
 	if (contents) {
