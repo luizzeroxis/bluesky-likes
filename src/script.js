@@ -505,7 +505,12 @@ const makePostEmbeds = (postEmbeds, post, depth) => {
 				});
 				hls.loadSource(postEmbed.playlist);
 
-				let videoElem = html('video', { controls: true, autoplay: true, poster: postEmbed.thumbnail });
+				let videoElem = html('video', {
+					controls: true,
+					autoplay: true,
+					poster: postEmbed.thumbnail,
+					loop: (postEmbed.presentation == 'gif')
+				});
 				embedVideoElem.replaceChildren(videoElem);
 
 				hls.attachMedia(videoElem);
